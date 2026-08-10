@@ -165,7 +165,7 @@
                     <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Username / Callsign</label>
                     <div class="relative">
                         <i class="fa-solid fa-user absolute left-3 top-3.5 text-slate-500"></i>
-                        <input type="text" id="loginUser" required placeholder="Contoh: President / RoadCaptain" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-red-600 text-sm">
+                        <input type="text" id="loginUser" required placeholder="Masukan Username Yang sudah terdaftar" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-red-600 text-sm">
                     </div>
                 </div>
 
@@ -178,7 +178,7 @@
                 </div>
 
                 <div class="p-3 bg-red-950/40 border border-red-900/50 rounded-lg text-[11px] text-red-300">
-                    <i class="fa-solid fa-circle-info mr-1"></i> Gunakan Password dan Username yang sudah terdaftar</b>
+                    <i class="fa-solid fa-circle-info mr-1"></i> Gunakan Username Dan Password, jika kesulitan bisa report ke DISCORD
                 </div>
 
                 <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg uppercase tracking-wider text-sm transition">
@@ -640,6 +640,10 @@
         let currentUser = localStorage.getItem('biker_user') || null;
         let webhookUrl = localStorage.getItem('biker_webhook') || 'https://discord.com/api/webhooks/1536094807557152869/YIGzQRhwc-xD-Y-UTEej1LR6PiXOjICRUmXYMbfn6UXB2aLHh9qze0rsq693eOl1lVTJ';
         
+        let registeredUsers = JSON.parse(localStorage.getItem('biker_registered_users')) || [
+            'presiden', 'president', 'vicepresident', 'roadcaptain', 'enforcer', 'secretary', 'treasurer', 'prospect', 'member','maslannn'
+        ];
+        
         let items = JSON.parse(localStorage.getItem('biker_items')) || defaultItems;
         let logs = JSON.parse(localStorage.getItem('biker_logs')) || [];
         let cashlogs = JSON.parse(localStorage.getItem('biker_cashlogs')) || [];
@@ -733,13 +737,20 @@
             const pass = document.getElementById('loginPass').value.trim();
 
             showLoader("MENGOTENTIKASI...", "Memeriksa Kredensial Club...", 600, () => {
-                if ((user.toLowerCase() === 'presiden' || user.toLowerCase() === 'president' || user.length > 0) && pass === '123456') {
+                const isUserRegistered = registeredUsers.some(u => u.toLowerCase() === user.toLowerCase());
+                
+                if (!isUserRegistered) {
+                    showErrorModal(`Username "${user}" tidak terdaftar dalam database klub! Silakan gunakan Callsign / Username resmi yang terdafta.`);
+                    return;
+                }
+
+                if (pass === '123456') {
                     currentUser = user;
                     localStorage.setItem('biker_user', currentUser);
                     checkAuth();
                     addLog('LOGIN SYSTEM', `Member ${user} berhasil masuk ke repository.`);
                 } else {
-                    showErrorModal('Username atau Password yang Anda masukkan salah! (Default Password: 123456)');
+                    showErrorModal('Password yang Anda masukkan salah!Gunakakn passeord yang sudah tedaftar');
                 }
             });
         }
