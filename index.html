@@ -154,38 +154,82 @@
     <!-- 11. LOGIN MODAL / SCREEN -->
     <div id="loginScreen" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-biker-dark bg-biker-texture p-4">
         <div class="max-w-md w-full bg-biker-card border border-biker-border rounded-xl p-6 shadow-2xl">
-            <div class="text-center mb-6">
+            <div class="text-center mb-5">
                 <i class="fa-solid fa-shield-halved text-4xl text-red-600 mb-2"></i>
                 <h2 class="font-bikerTitle text-3xl text-white uppercase tracking-wider">OTENTIKASI ANGGOTA</h2>
-                <p class="text-xs text-slate-400">Masukkan kredensial khusus Officer/Member</p>
+                <p class="text-xs text-slate-400">Pilih akses cepat atau login High Rank Officer</p>
             </div>
 
+            <!-- QUICK ACCESS BUTTONS (1-CLICK LOGIN TANPA KETIK) -->
+            <div class="mb-5 space-y-2">
+                <label class="block text-[11px] uppercase tracking-wider font-bold text-amber-500 mb-1">
+                    <i class="fa-solid fa-bolt mr-1"></i> Akses Cepat Langsung:
+                </label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" onclick="quickAccessLogin('Member', 'MEMBER')" class="bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-white p-2.5 rounded-lg border border-amber-600/60 shadow flex flex-col items-center justify-center transition active:scale-95 group">
+                        <span class="font-bikerTitle text-base uppercase tracking-wider group-hover:scale-105 transition"><i class="fa-solid fa-user-check mr-1"></i> MEMBER</span>
+                        <span class="text-[9px] text-amber-200">Read-Only</span>
+                    </button>
+                    <button type="button" onclick="quickAccessLogin('Prospect', 'MEMBER')" class="bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 text-slate-200 p-2.5 rounded-lg border border-slate-700 shadow flex flex-col items-center justify-center transition active:scale-95 group">
+                        <span class="font-bikerTitle text-base uppercase tracking-wider group-hover:scale-105 transition"><i class="fa-solid fa-id-badge mr-1"></i> PROSPECT</span>
+                        <span class="text-[9px] text-slate-400">Read-Only</span>
+                    </button>
+                    <button type="button" onclick="openHighRankPasswordModal()" class="bg-gradient-to-r from-red-800 to-red-950 hover:from-red-700 hover:to-red-900 text-white p-2.5 rounded-lg border border-red-600/60 shadow flex flex-col items-center justify-center transition active:scale-95 group">
+                        <span class="font-bikerTitle text-base uppercase tracking-wider group-hover:scale-105 transition"><i class="fa-solid fa-crown text-amber-400 mr-1"></i> HIGH RANK</span>
+                        <span class="text-[9px] text-red-200">Full Control</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="relative flex py-1 items-center mb-4">
+                <div class="flex-grow border-t border-slate-800"></div>
+                <span class="flex-shrink mx-3 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Atau Login Manual / Officer</span>
+                <div class="flex-grow border-t border-slate-800"></div>
+            </div>
+
+            <!-- MANUAL FORM SETUP WITH DROPDOWN OPTIONS -->
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Username / Callsign</label>
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Pilih Username / Callsign</label>
                     <div class="relative">
-                        <i class="fa-solid fa-user absolute left-3 top-3.5 text-slate-500"></i>
-                        <input type="text" id="loginUser" required placeholder="Masukan Username Yang sudah terdaftar" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-red-600 text-sm">
+                        <i class="fa-solid fa-user-ninja absolute left-3 top-3.5 text-slate-500 z-10"></i>
+                        <select id="loginUserSelect" onchange="togglePasswordVisibilityByRole()" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-red-600 text-xs font-semibold appearance-none cursor-pointer">
+                            <option value="member">🔰 Member / Prospect (Akses Langsung - Tanpa Password)</option>
+                            <option value="presiden">👑 Presiden (High Rank Officer)</option>
+                            <option value="vicepresident">⭐ Vice President (High Rank Officer)</option>
+                            <option value="roadcaptain">🏍️ Road Captain (High Rank Officer)</option>
+                            <option value="enforcer">🛡️ Enforcer (High Rank Officer)</option>
+                            <option value="secretary">📜 Secretary (High Rank Officer)</option>
+                            <option value="treasurer">💰 Treasurer (High Rank Officer)</option>
+                            <option value="CUSTOM">✏️ Tulis Username Lain secara Manual...</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-3 top-3.5 text-slate-500 pointer-events-none"></i>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Password</label>
+                <!-- HIDDEN CUSTOM INPUT FIELD IF "CUSTOM" SELECTED -->
+                <div id="customUserContainer" class="hidden">
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Tulis Callsign / Username</label>
+                    <input type="text" id="loginUserCustom" placeholder="Masukkan nama callsign Anda..." class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 px-3 text-white focus:outline-none focus:border-red-600 text-sm">
+                </div>
+
+                <!-- PASSWORD INPUT CONTAINER (AUTOMATICALLY HIDDEN FOR MEMBER/PROSPECT) -->
+                <div id="loginPassContainer" class="hidden">
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Password High Rank</label>
                     <div class="relative">
                         <i class="fa-solid fa-lock absolute left-3 top-3.5 text-slate-500"></i>
-                        <input type="password" id="loginPass" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-red-600 text-sm">
+                        <input type="password" id="loginPass" placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-red-600 text-sm">
                     </div>
                 </div>
 
                 <div class="p-3 bg-red-950/40 border border-red-900/50 rounded-lg text-[11px] text-red-300 space-y-1">
                     <p class="font-bold flex items-center gap-1 text-amber-400"><i class="fa-solid fa-shield-cat"></i> Informasi Akses Role:</p>
-                    <p>• <b>High Rank</b> (Full Control) </i></p>
-                    <p>• <b>Member</b> (Read Only)</i></p>
-                    <p class="text-[10px] text-slate-400 mt-1"><i class="fa-solid fa-key mr-1"></i> Gunakan username dan password yang sudah terdaftar </b></p>
+                    <p>• <b>High Rank</b> (Full Control - Memerlukan Password) </i></p>
+                    <p>• <b>Member / Prospect</b> (Read Only - Langsung Masuk tanpa password)</i></p>
                 </div>
 
-                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg uppercase tracking-wider text-sm transition">
-                    <i class="fa-solid fa-key mr-2"></i> SUBMIT
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg uppercase tracking-wider text-sm transition shadow-lg">
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i> MASUK SYSTEM
                 </button>
             </form>
         </div>
@@ -204,6 +248,42 @@
             <button onclick="closeErrorModal()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg text-sm uppercase tracking-wider transition shadow-lg">
                 <i class="fa-solid fa-rotate-left mr-1"></i> Coba Lagi
             </button>
+        </div>
+    </div>
+
+    <!-- MODAL: High Rank Quick Access Password Verification -->
+    <div id="highRankPassModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="animate-popup max-w-sm w-full bg-biker-card border-2 border-red-600 rounded-xl p-6 shadow-2xl text-center relative overflow-hidden">
+            <button onclick="closeHighRankPassModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="w-14 h-14 bg-red-950/80 border border-red-600 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                <i class="fa-solid fa-crown"></i>
+            </div>
+            <h3 class="font-bikerTitle text-2xl text-white uppercase mb-1 tracking-wider">AKSES HIGH RANK</h3>
+            <p class="text-xs text-slate-400 mb-4">Masukkan Password High Rank Officer untuk melanjutkan</p>
+            
+            <form onsubmit="handleQuickHighRankAuth(event)" class="space-y-4">
+                <div class="text-left">
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Pilih Officer Title</label>
+                    <select id="quickHighRankRole" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white font-semibold focus:outline-none focus:border-red-600">
+                        <option value="Presiden">👑 Presiden</option>
+                        <option value="Vice President">⭐ Vice President</option>
+                        <option value="Road Captain">🏍️ Road Captain</option>
+                        <option value="Enforcer">🛡️ Enforcer</option>
+                        <option value="Secretary">📜 Secretary</option>
+                        <option value="Treasurer">💰 Treasurer</option>
+                    </select>
+                </div>
+                <div class="text-left">
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Password High Rank</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3 top-3.5 text-slate-500"></i>
+                        <input type="password" id="quickHighRankPass" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-red-600 text-sm">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-2.5 rounded-lg text-sm uppercase tracking-wider transition shadow-lg">
+                    <i class="fa-solid fa-key mr-1.5"></i> Verifikasi & Masuk
+                </button>
+            </form>
         </div>
     </div>
 
@@ -579,7 +659,7 @@
                 </div>
 
                 <div>
-                    <label class="text-xs text-slate-400 uppercase">Catatan / Penanggung Jawab</label>
+                    <label class="text-xs text-slate-400 uppercase">Pelapor/Pegurus</label>
                     <input type="text" id="stockModalNotes" placeholder="Contoh: Diambil oleh Alex / Hasil Setoran Touring" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
                 </div>
 
@@ -603,7 +683,7 @@
             { id: '8', name: 'BOTOL', category: 'mentah', qty: 142, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19570_b.jpg' },
             { id: '10', name: 'KEVLAR', category: 'jadi', qty: 93, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19515_b.jpg' },
             { id: '11', name: 'ANGGUR MERAH', category: 'jadi', qty: 8, unit: 'Botol', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/1669_b.jpg' },
-            { id: '12', name: 'BEER', category: 'persenjataan', qty: 4, unit: 'Botol', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19824_b.jpg' },
+            { id: '12', name: 'BEER', category: 'jadi', qty: 4, unit: 'Botol', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19824_b.jpg' },
             { id: '13', name: 'DESERT EAGLE ', category: 'persenjataan', qty: 306, unit: 'Pcs', image: 'https://dev.prineside.com/en/gtasa_samp_model_id/model/348-desert_eagle/' },
             { id: '14', name: 'AK47', category: 'persenjataan', qty: 200, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/355_b.jpg' },
             { id: '15', name: 'SHOTGUN', category: 'persenjataan', qty: 390, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/349_b.jpg' },
@@ -1008,16 +1088,102 @@
             }
         }
 
+        function togglePasswordVisibilityByRole() {
+            const selectEl = document.getElementById('loginUserSelect');
+            const customUserContainer = document.getElementById('customUserContainer');
+            const passContainer = document.getElementById('loginPassContainer');
+            if (!selectEl || !passContainer) return;
+
+            const val = selectEl.value;
+
+            // Toggle custom input container
+            if (val === 'CUSTOM') {
+                if (customUserContainer) customUserContainer.classList.remove('hidden');
+            } else {
+                if (customUserContainer) customUserContainer.classList.add('hidden');
+            }
+
+            // Check if selected role is high rank or custom
+            if (highRankUsers.includes(val) || val === 'CUSTOM') {
+                passContainer.classList.remove('hidden');
+            } else {
+                // Member / Prospect: Hide password field completely
+                passContainer.classList.add('hidden');
+            }
+        }
+
+        function openHighRankPasswordModal() {
+            const modal = document.getElementById('highRankPassModal');
+            const passInput = document.getElementById('quickHighRankPass');
+            if (passInput) passInput.value = '';
+            if (modal) modal.classList.remove('hidden');
+            setTimeout(() => { if (passInput) passInput.focus(); }, 100);
+        }
+
+        function closeHighRankPassModal() {
+            const modal = document.getElementById('highRankPassModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function handleQuickHighRankAuth(e) {
+            e.preventDefault();
+            const passInput = document.getElementById('quickHighRankPass');
+            const roleSelect = document.getElementById('quickHighRankRole');
+            const pass = passInput ? passInput.value.trim() : '';
+            const role = roleSelect ? roleSelect.value : 'Presiden';
+
+            if (pass === '123456') {
+                closeHighRankPassModal();
+                quickAccessLogin(role, 'HIGH_RANK');
+            } else {
+                closeHighRankPassModal();
+                showErrorModal('Password High Rank yang Anda masukkan salah!');
+            }
+        }
+
+        function quickAccessLogin(username, role = 'MEMBER') {
+            showLoader("MENGOTENTIKASI...", `Akses Cepat ${username}...`, 500, () => {
+                currentUser = username;
+                currentUserRole = role;
+
+                localStorage.setItem('biker_user', currentUser);
+                localStorage.setItem('biker_user_role', currentUserRole);
+
+                checkAuth();
+                addLog('LOGIN SYSTEM', `[${currentUserRole}] ${username} berhasil masuk ke repository (Akses Cepat).`);
+            });
+        }
+
         function handleLogin(e) {
             e.preventDefault();
-            const user = document.getElementById('loginUser').value.trim();
+            const selectEl = document.getElementById('loginUserSelect');
+            let user = selectEl ? selectEl.value : 'member';
+
+            if (user === 'CUSTOM') {
+                user = document.getElementById('loginUserCustom').value.trim();
+            }
+
+            if (!user) {
+                showErrorModal('Silakan pilih atau ketik username/callsign Anda!');
+                return;
+            }
+
+            const userLower = user.toLowerCase();
+            const isHighRankRole = highRankUsers.includes(userLower);
+
+            // If selected role is Member/Prospect, bypass password
+            if (!isHighRankRole && userLower !== 'custom') {
+                quickAccessLogin(user.toUpperCase(), 'MEMBER');
+                return;
+            }
+
+            // Otherwise check password for Officer / Custom input
             const pass = document.getElementById('loginPass').value.trim();
 
             showLoader("MENGOTENTIKASI...", "Memeriksa Kredensial Club...", 600, () => {
-                const userLower = user.toLowerCase();
                 const isUserRegistered = registeredUsers.some(u => u.toLowerCase() === userLower);
                 
-                if (!isUserRegistered) {
+                if (!isUserRegistered && userLower !== 'custom') {
                     showErrorModal(`Username "${user}" tidak terdaftar dalam database klub! Silakan gunakan Callsign / Username resmi yang terdaftar.`);
                     return;
                 }
@@ -1025,7 +1191,7 @@
                 if (pass === '123456') {
                     currentUser = user;
                     // Determine Role
-                    if (highRankUsers.includes(userLower)) {
+                    if (isHighRankRole) {
                         currentUserRole = 'HIGH_RANK';
                     } else {
                         currentUserRole = 'MEMBER';
@@ -1037,7 +1203,7 @@
                     checkAuth();
                     addLog('LOGIN SYSTEM', `[${currentUserRole}] Member ${user} berhasil masuk ke repository.`);
                 } else {
-                    showErrorModal('Password yang Anda masukkan salah! Gunakan password yang sudah terdaftar.');
+                    showErrorModal('Password High Rank yang Anda masukkan salah! Gunakan password resmi.');
                 }
             });
         }
