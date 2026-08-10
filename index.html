@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WESGATH MC - MANAGEMENT SYSTEM</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rajdhani:wght@500;600;700&family=Teko:wght@600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        biker: {
+                            dark: '#0a0a0c',
+                            card: '#14161b',
+                            border: '#2a2e37',
+                            red: '#dc2626',
+                            gold: '#d97706',
+                            accent: '#991b1b',
+                            steel: '#475569'
+                        }
+                    },
+                    fontFamily: {
+                        bikerTitle: ['Teko', 'sans-serif'],
+                        bikerBadge: ['Permanent Marker', 'cursive'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a0a0c;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            touch-action: manipulation;
+        }
+
+        .bg-biker-texture {
+            background-image: radial-gradient(rgba(220, 38, 38, 0.08) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+
+        /* Animations */
+        @keyframes popupZoom {
+            0% { transform: scale(0.6) translateY(30px); opacity: 0; }
+            50% { transform: scale(1.05) translateY(-5px); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); }
+        }
+
+        @keyframes spinFast {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes revEngine {
+            0%, 100% { transform: scale(1) translateY(0); }
+            25% { transform: scale(1.1) translateY(-3px) rotate(-2deg); }
+            75% { transform: scale(1.05) translateY(2px) rotate(2deg); }
+        }
+
+        .animate-popup {
+            animation: popupZoom 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .glow-red {
+            animation: pulseGlow 2.5s infinite;
+        }
+
+        .animate-wheel-spin {
+            animation: spinFast 0.8s linear infinite;
+        }
+
+        .animate-rev-engine {
+            animation: revEngine 0.35s ease-in-out infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #dc2626;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-biker-dark text-slate-200 min-h-screen pb-20 bg-biker-texture selection:bg-red-900 selection:text-white">
+
+    <!-- GLOBAL ACTION LOADING SCREEN OVERLAY -->
+    <div id="actionLoadingOverlay" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md transition-all duration-300">
+        <div class="flex flex-col items-center text-center p-6 rounded-2xl bg-biker-card border border-red-600/40 shadow-2xl max-w-xs w-full animate-popup">
+            <div class="relative w-20 h-20 mb-4 flex items-center justify-center">
+                <!-- Outer Spinning Gear Ring -->
+                <i class="fa-solid fa-gear text-6xl text-red-600/30 animate-wheel-spin absolute"></i>
+                <!-- Inner Biker Icon -->
+                <i class="fa-solid fa-motorcycle text-3xl text-red-500 animate-rev-engine relative z-10"></i>
+            </div>
+            <h4 id="actionLoadingTitle" class="font-bikerTitle text-2xl text-red-600 uppercase tracking-wider mb-1">MEMPROSES DATA...</h4>
+            <p id="actionLoadingSubtext" class="text-xs text-slate-400 font-mono animate-pulse">Mohon tunggu sebentar...</p>
+            
+            <!-- Progress Bar Line -->
+            <div class="w-full bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden">
+                <div id="actionProgressBar" class="bg-gradient-to-r from-red-600 to-amber-500 h-full w-0 transition-all duration-500"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 10. SPLASH SCREEN -->
+    <div id="splashScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-biker-dark bg-biker-texture p-4 transition-opacity duration-500">
+        <div class="animate-popup max-w-sm w-full bg-biker-card border-2 border-biker-red rounded-xl p-6 text-center shadow-2xl relative overflow-hidden glow-red">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-red-600/10 rounded-full blur-2xl"></div>
+            
+            <!-- Logo Custom linkable -->
+            <div class="relative w-32 h-32 mx-auto mb-4 group">
+                <img id="splashLogo" src="https://i.imgur.com/xdrO148.png" 
+                     alt="MC Logo" class="w-full h-full object-cover rounded-full border-2 border-red-600 shadow-md">
+                <label for="splashLogoUpload" class="absolute bottom-0 right-0 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full text-xs shadow cursor-pointer" title="Upload Logo Baru">
+                    <i class="fa-solid fa-camera"></i>
+                </label>
+                <input type="file" id="splashLogoUpload" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+            </div>
+
+            <h1 class="font-bikerTitle text-4xl font-bold tracking-wider text-red-600 uppercase">WESGATH MC</h1>
+            <p class="font-bikerBadge text-amber-500 text-sm mb-2">OFFICIAL CLUB SYSTEM v1.0</p>
+            <p class="text-xs text-slate-400 mb-6 uppercase tracking-widest">Brotherhood • Loyalty • Respect</p>
+
+            <button onclick="closeSplash()" class="w-full bg-gradient-to-r from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-white font-bold py-3 px-6 rounded-lg tracking-wider text-lg shadow-lg border border-red-500 uppercase flex items-center justify-center gap-2 transition active:scale-95">
+                <i class="fa-solid fa-motorcycle"></i> MASUK REPOSITORY
+            </button>
+        </div>
+    </div>
+
+    <!-- 11. LOGIN MODAL / SCREEN -->
+    <div id="loginScreen" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-biker-dark bg-biker-texture p-4">
+        <div class="max-w-md w-full bg-biker-card border border-biker-border rounded-xl p-6 shadow-2xl">
+            <div class="text-center mb-6">
+                <i class="fa-solid fa-shield-halved text-4xl text-red-600 mb-2"></i>
+                <h2 class="font-bikerTitle text-3xl text-white uppercase tracking-wider">OTENTIKASI ANGGOTA</h2>
+                <p class="text-xs text-slate-400">Masukkan kredensial khusus Officer/Member</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Username / Callsign</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3 top-3.5 text-slate-500"></i>
+                        <input type="text" id="loginUser" required placeholder="Contoh: President / RoadCaptain" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-red-600 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3 top-3.5 text-slate-500"></i>
+                        <input type="password" id="loginPass" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-red-600 text-sm">
+                    </div>
+                </div>
+
+                <div class="p-3 bg-red-950/40 border border-red-900/50 rounded-lg text-[11px] text-red-300">
+                    <i class="fa-solid fa-circle-info mr-1"></i> Gunakan Password dan Username yang sudah terdaftar</b>
+                </div>
+
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg uppercase tracking-wider text-sm transition">
+                    <i class="fa-solid fa-key mr-2"></i> SUBMIT
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Error Notification (Password / Login Salah) -->
+    <div id="errorModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="animate-popup max-w-sm w-full bg-biker-card border-2 border-red-600 rounded-xl p-6 shadow-2xl text-center relative overflow-hidden">
+            <div class="w-16 h-16 bg-red-950/80 border-2 border-red-600 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl animate-bounce">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="font-bikerTitle text-2xl text-red-600 uppercase mb-2 tracking-wider">AKSES DITOLAK!</h3>
+            <p id="errorMessage" class="text-xs text-slate-300 mb-6 leading-relaxed">
+                Username atau Password yang Anda masukkan salah. Silakan coba lagi.
+            </p>
+            <button onclick="closeErrorModal()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg text-sm uppercase tracking-wider transition shadow-lg">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Coba Lagi
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER (Hidden until authentication) -->
+    <div id="mainContent" class="hidden">
+        <!-- SIDEBAR DRAWER OVERLAY & PANEL (GARIS 3 POPUP) -->
+        <div id="sidebarBackdrop" onclick="closeSidebar()" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+        <aside id="sidebarDrawer" class="fixed top-0 left-0 bottom-0 z-50 w-72 max-w-[80vw] bg-biker-card border-r border-biker-border shadow-2xl transform -translate-x-full transition-transform duration-300 flex flex-col justify-between">
+            <div>
+                <!-- Sidebar Header -->
+                <div class="p-5 border-b border-biker-border flex items-center justify-between bg-black/40">
+                    <div class="flex items-center gap-3">
+                        <img id="sidebarLogo" src="https://i.imgur.com/xdrO148.png" class="w-10 h-10 rounded-full border-2 border-red-600 object-cover">
+                        <div>
+                            <h2 class="font-bikerTitle text-xl text-red-600 leading-tight tracking-wider">WESGATH MC</h2>
+                            <span id="userBadgeSidebar" class="text-[10px] text-amber-500 font-mono block">GUEST</span>
+                        </div>
+                    </div>
+                    <button onclick="closeSidebar()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Nav Menu Options -->
+                <div class="p-4 space-y-1">
+                    <div class="px-3 py-2 text-[10px] uppercase font-bold tracking-widest text-slate-500">Menu Inventaris</div>
+                    
+                    <button onclick="switchTab('mentah')" id="nav-mentah" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-white bg-red-600">
+                        <i class="fa-solid fa-cubes w-5 text-center text-red-300"></i> Barang Mentah
+                    </button>
+
+                    <button onclick="switchTab('jadi')" id="nav-jadi" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-slate-400 hover:bg-slate-800/60 hover:text-white">
+                        <i class="fa-solid fa-box w-5 text-center text-amber-400"></i> Barang Jadi
+                    </button>
+
+                    <button onclick="switchTab('persenjataan')" id="nav-persenjataan" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-slate-400 hover:bg-slate-800/60 hover:text-white">
+                        <i class="fa-solid fa-gun w-5 text-center text-red-500"></i> Persenjataan
+                    </button>
+
+                    <button onclick="switchTab('brankas')" id="nav-brankas" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-slate-400 hover:bg-slate-800/60 hover:text-white">
+                        <i class="fa-solid fa-vault w-5 text-center text-yellow-500"></i> Brankas Asset
+                    </button>
+
+                    <button onclick="switchTab('keuangan')" id="nav-keuangan" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-slate-400 hover:bg-slate-800/60 hover:text-white">
+                        <i class="fa-solid fa-money-bill-transfer w-5 text-center text-emerald-400"></i> Keuangan & Kas
+                    </button>
+
+                    <div class="px-3 pt-4 pb-1 text-[10px] uppercase font-bold tracking-widest text-slate-500">Aksi & Sistem</div>
+
+                    <button onclick="openAddItemModal(); closeSidebar();" id="navAddItemBtn" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition text-emerald-400 hover:bg-emerald-950/40 border border-emerald-900/50 uppercase">
+                        <i class="fa-solid fa-plus w-5 text-center"></i> Tambah Barang
+                    </button>
+
+                    <button onclick="openWebhookModal(); closeSidebar();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition text-indigo-400 hover:bg-indigo-950/40 border border-indigo-900/50 uppercase">
+                        <i class="fa-brands fa-discord w-5 text-center"></i> Set Webhook Discord
+                    </button>
+
+                    <button onclick="sendFullReportWebhook(); closeSidebar();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition text-amber-400 hover:bg-amber-950/40 border border-amber-900/50 uppercase">
+                        <i class="fa-solid fa-paper-plane w-5 text-center"></i> Kirim Laporan Total
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sidebar Footer (Logout) -->
+            <div class="p-4 border-t border-biker-border bg-black/40">
+                <button onclick="logout()" class="w-full bg-red-950/80 hover:bg-red-900 border border-red-800 text-red-300 font-bold py-2.5 rounded-lg text-xs flex items-center justify-center gap-2 uppercase tracking-wider transition">
+                    <i class="fa-solid fa-power-off"></i> Keluar / Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN APP HEADER -->
+        <div id="appHeader" class="sticky top-0 z-30 bg-biker-card/95 backdrop-blur border-b border-biker-border px-4 py-3 shadow-lg">
+            <div class="max-w-6xl mx-auto flex items-center justify-between">
+                <!-- Hamburger Menu Toggle Button & Title -->
+                <div class="flex items-center gap-3">
+                    <button onclick="openSidebar()" class="p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-red-500 rounded-lg text-lg border border-slate-700/80 transition active:scale-95" title="Buka Menu Options">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    
+                    <div class="flex items-center gap-2">
+                        <img id="appBarLogo" src="https://i.imgur.com/xdrO148.png" class="w-9 h-9 rounded-full border border-red-600 object-cover">
+                        <div>
+                            <h1 class="font-bikerTitle text-xl text-red-600 leading-none tracking-wider">WESGATH MC</h1>
+                            <span id="activeSectionTitle" class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase block">BARANG MENTAH</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div class="flex items-center gap-2">
+                    <button id="sendPendingWebhookBtn" onclick="sendPendingWebhooks()" class="hidden bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 uppercase tracking-wider shadow transition animate-pulse">
+                        <i class="fa-brands fa-discord"></i>
+                        <span>Kirim <span id="pendingCountBadge" class="bg-black/40 px-1.5 py-0.5 rounded text-[11px]">0</span> Log</span>
+                    </button>
+                    <button onclick="openAddItemModal()" id="headerAddBtn" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 uppercase tracking-wider shadow transition">
+                        <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Tambah</span>
+                    </button>
+                    <button onclick="openWebhookModal()" class="p-2 bg-slate-800 hover:bg-slate-700 text-indigo-400 rounded-lg text-xs border border-slate-700" title="Webhook Discord">
+                        <i class="fa-brands fa-discord text-base"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTAINER -->
+        <main class="max-w-6xl mx-auto px-4 py-6">
+            <!-- STATS CARDS -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-6">
+                <div class="bg-biker-card p-3.5 rounded-xl border border-biker-border">
+                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
+                        <span>BRANKAS KAS</span>
+                        <i class="fa-solid fa-vault text-amber-500"></i>
+                    </div>
+                    <div id="statVault" class="text-base md:text-lg font-bold text-amber-400 font-mono">Rp 0</div>
+                    <span class="text-[10px] text-slate-500">Kas Clean / Legal</span>
+                </div>
+
+                <div class="bg-biker-card p-3.5 rounded-xl border border-biker-border border-red-900/40">
+                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
+                        <span class="text-red-400">UANG MERAH</span>
+                        <i class="fa-solid fa-sack-dollar text-red-500"></i>
+                    </div>
+                    <div id="statRedVault" class="text-base md:text-lg font-bold text-red-500 font-mono">Rp 0</div>
+                    <span class="text-[10px] text-slate-500">Kas Uang Merah</span>
+                </div>
+
+                <div class="bg-biker-card p-3.5 rounded-xl border border-biker-border">
+                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
+                        <span>PERSENJATAAN</span>
+                        <i class="fa-solid fa-gun text-red-500"></i>
+                    </div>
+                    <div id="statWeapons" class="text-lg md:text-xl font-bold text-red-400 font-mono">0 Item</div>
+                    <span class="text-[10px] text-slate-500">Armory Club</span>
+                </div>
+
+                <div class="bg-biker-card p-3.5 rounded-xl border border-biker-border">
+                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
+                        <span>BARANG MENTAH</span>
+                        <i class="fa-solid fa-boxes-stacked text-blue-400"></i>
+                    </div>
+                    <div id="statRaw" class="text-lg md:text-xl font-bold text-blue-300 font-mono">0 Stok</div>
+                    <span class="text-[10px] text-slate-500">Bahan Baku</span>
+                </div>
+
+                <div class="bg-biker-card p-3.5 rounded-xl border border-biker-border">
+                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
+                        <span>BARANG JADI</span>
+                        <i class="fa-solid fa-box-check text-emerald-400"></i>
+                    </div>
+                    <div id="statFinished" class="text-lg md:text-xl font-bold text-emerald-400 font-mono">0 Stok</div>
+                    <span class="text-[10px] text-slate-500">Produk Siap Pakai</span>
+                </div>
+            </div>
+
+            <!-- INVENTORY CONTENT GRID -->
+            <div id="inventoryContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Items injected by JS -->
+            </div>
+
+            <!-- KEUANGAN / CASHFLOW CONTENT SECTION (Hidden by Default) -->
+            <div id="keuanganContainer" class="hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-biker-card p-5 rounded-xl border border-biker-border md:col-span-1">
+                        <h3 class="font-bikerTitle text-xl text-amber-500 mb-4 uppercase">Catat Transaksi Kas</h3>
+                        <form onsubmit="addCashflow(event)" class="space-y-3">
+                            <div>
+                                <label class="text-xs text-slate-400 uppercase">Kategori Kas / Uang</label>
+                                <select id="cashCurrency" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
+                                    <option value="CLEAN">💵 Uang Clean / Kas Club Regular</option>
+                                    <option value="RED">🔴 Uang Merah (Dirty Money)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 uppercase">Jenis Transaksi</label>
+                                <select id="cashType" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
+                                    <option value="IN">Pemasukan (Cash In)</option>
+                                    <option value="OUT">Pengeluaran (Cash Out)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 uppercase">Kategori Keperluan</label>
+                                <select id="cashCategory" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
+                                    <option value="Iuran Anggota">💳 Iuran Anggota / Kas Club</option>
+                                    <option value="Hasil Operasi / Robbery">💰 Hasil Operasi / Robbery / Begal</option>
+                                    <option value="Bensin & Operasional">⛽ Bensin & Operasional Touring</option>
+                                    <option value="Pembelian Senjata & Amunisi">🔫 Pembelian Senjata & Amunisi</option>
+                                    <option value="Repair / Mekanik">🛠️ Repair / Service Kendaraan</option>
+                                    <option value="Event / Pesta / Bar">🍻 Event Club / Bar / Pesta</option>
+                                    <option value="Beli Material / Stok">📦 Pembelian Material & Stok</option>
+                                    <option value="Lainnya">❓ Lain-lain</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 uppercase">Jumlah (Rp)</label>
+                                <input type="number" id="cashAmount" required placeholder="0" min="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
+                            </div>
+                            
+                            <!-- FILE UPLOAD & URL FOR CASH PROOF -->
+                            <div>
+                                <label class="text-xs text-slate-400 uppercase block mb-1">Bukti Struk / Foto (Upload File atau URL)</label>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <label class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs py-2 px-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition">
+                                        <i class="fa-solid fa-upload text-amber-400"></i>
+                                        <span id="cashFileLabel">Pilih Foto dari Perangkat...</span>
+                                        <input type="file" id="cashFileInput" accept="image/*" class="hidden" onchange="handleImageFileSelect(event, 'cashProofImage', 'cashProofPreview', 'cashFileLabel')">
+                                    </label>
+                                </div>
+                                <input type="text" id="cashProofImage" placeholder="Atau tempel Link URL Foto (https://...)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
+                                <div id="cashProofPreviewContainer" class="hidden mt-2 p-2 bg-black/40 border border-slate-800 rounded-lg flex items-center gap-3">
+                                    <img id="cashProofPreview" src="" class="w-12 h-12 object-cover rounded border border-slate-700">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-[11px] text-emerald-400 font-bold">Gambar Terpasang</p>
+                                        <button type="button" onclick="clearImageSelect('cashProofImage', 'cashProofPreviewContainer', 'cashFileInput', 'cashFileLabel')" class="text-[10px] text-red-400 hover:underline">Hapus Foto</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-slate-400 uppercase">Catatan Tambahan (Opsional)</label>
+                                <textarea id="cashNotes" placeholder="Catatan detail tambahan jika ada..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1 h-16"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-3 rounded-lg uppercase tracking-wider transition">
+                                Simpan Transaksi Keuangan
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="bg-biker-card p-5 rounded-xl border border-biker-border md:col-span-2">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bikerTitle text-xl text-white uppercase">Riwayat Kas Keluar Masuk</h3>
+                            <button onclick="clearCashLogs()" class="text-xs text-red-400 hover:underline"><i class="fa-solid fa-trash mr-1"></i> Reset Log</button>
+                        </div>
+                        <div id="cashflowLogs" class="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+                            <!-- Logs injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRANSACTION LOGS & REPORT -->
+            <div class="mt-8 bg-biker-card border border-biker-border rounded-xl p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bikerTitle text-2xl text-red-600 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-list"></i> LOG KELUAR MASUK BARANG
+                    </h3>
+                    <button onclick="sendFullReportWebhook()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
+                        <i class="fa-brands fa-discord"></i> Kirim Laporan Total
+                    </button>
+                </div>
+                <div id="activityLogs" class="space-y-2 max-h-60 overflow-y-auto font-mono text-xs text-slate-300">
+                    <!-- Activity logs injected by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: Tambah / Edit Item -->
+    <div id="itemModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+        <div class="max-w-md w-full bg-biker-card border border-biker-border rounded-xl p-6 shadow-2xl relative">
+            <button onclick="closeItemModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            
+            <h3 id="modalTitle" class="font-bikerTitle text-2xl text-red-600 uppercase mb-4">TAMBAH ITEM BARU</h3>
+            
+            <form id="itemForm" onsubmit="saveItem(event)" class="space-y-3">
+                <input type="hidden" id="itemId">
+                
+                <div>
+                    <label class="text-xs text-slate-400 uppercase">Kategori</label>
+                    <select id="itemCategory" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
+                        <option value="mentah">Barang Mentah</option>
+                        <option value="jadi">Barang Jadi</option>
+                        <option value="persenjataan">Persenjataan</option>
+                        <option value="brankas">Brankas Asset/Valuables</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 uppercase">Nama Item / Barang</label>
+                    <input type="text" id="itemName" required placeholder="Contoh: Kevlar Vest / Busi Racing" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs text-slate-400 uppercase">Jumlah Stok / Nilai</label>
+                        <input type="number" id="itemQty" required min="0" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 uppercase">Satuan</label>
+                        <input type="text" id="itemUnit" placeholder="Pcs, Unit, Rp, Box" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
+                    </div>
+                </div>
+
+                <!-- ITEM IMAGE FILE UPLOAD + URL FALLBACK -->
+                <div>
+                    <label class="text-xs text-slate-400 uppercase block mb-1">Gambar Item (Upload File / URL)</label>
+                    <div class="flex items-center gap-2 mb-2">
+                        <label class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs py-2 px-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-image text-indigo-400"></i>
+                            <span id="itemFileLabel">Pilih File Gambar...</span>
+                            <input type="file" id="itemFileInput" accept="image/*" class="hidden" onchange="handleImageFileSelect(event, 'itemImage', 'itemImagePreview', 'itemFileLabel')">
+                        </label>
+                    </div>
+                    <input type="text" id="itemImage" placeholder="Atau Link URL Gambar (https://...)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
+                    <div id="itemImagePreviewContainer" class="hidden mt-2 p-2 bg-black/40 border border-slate-800 rounded-lg flex items-center gap-3">
+                        <img id="itemImagePreview" src="" class="w-12 h-12 object-cover rounded border border-slate-700">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[11px] text-indigo-300 font-bold">Preview Gambar Item</p>
+                            <button type="button" onclick="clearImageSelect('itemImage', 'itemImagePreviewContainer', 'itemFileInput', 'itemFileLabel')" class="text-[10px] text-red-400 hover:underline">Hapus Gambar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg uppercase tracking-wider text-sm mt-4 transition">
+                    <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Data
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Adjustment Stok (+) / (-) -->
+    <div id="stockModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="max-w-md w-full bg-biker-card border border-biker-border rounded-xl p-6 shadow-2xl relative animate-popup">
+            <button onclick="closeStockModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            
+            <h3 id="stockModalTitle" class="font-bikerTitle text-2xl text-red-600 uppercase mb-1">UPDATE STOK BARANG</h3>
+            <p id="stockModalItemInfo" class="text-xs text-slate-400 font-mono mb-4">ITEM NAME</p>
+
+            <input type="hidden" id="stockModalItemId">
+            
+            <!-- Toggle Mode IN / OUT -->
+            <div class="grid grid-cols-2 gap-2 mb-4 bg-slate-900 p-1 rounded-lg border border-slate-800">
+                <button id="stockActionInBtn" type="button" onclick="setStockActionType('IN')" class="py-2 rounded-md font-bold text-xs uppercase tracking-wider transition bg-emerald-600 text-white">
+                    <i class="fa-solid fa-plus mr-1"></i> Masuk (+)
+                </button>
+                <button id="stockActionOutBtn" type="button" onclick="setStockActionType('OUT')" class="py-2 rounded-md font-bold text-xs uppercase tracking-wider transition text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-minus mr-1"></i> Keluar (-)
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400 uppercase">Jumlah / Kuantitas</label>
+                    <input type="number" id="stockModalAmount" min="1" value="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 uppercase block mb-1">Bukti Foto / Struk (Upload File atau URL)</label>
+                    <div class="flex items-center gap-2 mb-2">
+                        <label class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs py-2 px-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-upload text-red-400"></i>
+                            <span id="stockFileLabel">Pilih Foto dari Perangkat...</span>
+                            <input type="file" id="stockFileInput" accept="image/*" class="hidden" onchange="handleImageFileSelect(event, 'stockProofImage', 'stockProofPreview', 'stockFileLabel')">
+                        </label>
+                    </div>
+                    <input type="text" id="stockProofImage" placeholder="Atau Link URL Gambar (https://...)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
+                    <div id="stockProofPreviewContainer" class="hidden mt-2 p-2 bg-black/40 border border-slate-800 rounded-lg flex items-center gap-3">
+                        <img id="stockProofPreview" src="" class="w-12 h-12 object-cover rounded border border-slate-700">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[11px] text-red-400 font-bold">Bukti Foto Terpasang</p>
+                            <button type="button" onclick="clearImageSelect('stockProofImage', 'stockProofPreviewContainer', 'stockFileInput', 'stockFileLabel')" class="text-[10px] text-slate-400 hover:underline">Hapus Foto</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 uppercase">Catatan / Penanggung Jawab</label>
+                    <input type="text" id="stockModalNotes" placeholder="Contoh: Diambil oleh Alex / Hasil Setoran Touring" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
+                </div>
+
+                <button onclick="confirmStockChange()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg uppercase tracking-wider text-sm mt-2 transition shadow-lg">
+                    <i class="fa-solid fa-check mr-1"></i> Konfirmasi Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Webhook Discord Settings -->
+    <div id="webhookModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="max-w-md w-full bg-biker-card border border-biker-border rounded-xl p-6 shadow-2xl relative animate-popup">
+            <button onclick="closeWebhookModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            
+            <h3 class="font-bikerTitle text-2xl text-indigo-400 uppercase mb-2 flex items-center gap-2">
+                <i class="fa-brands fa-discord"></i> DISCORD WEBHOOK
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Pengaturan integrasi laporan otomatis ke channel Discord Club.</p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400 uppercase">URL Webhook Channel Discord</label>
+                    <input type="text" id="webhookInput" placeholder="https://discord.com/api/webhooks/..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white font-mono mt-1">
+                </div>
+
+                <div class="flex items-center justify-between p-3 bg-slate-900/60 rounded-lg border border-slate-800">
+                    <span class="text-xs text-slate-300">Auto Send Log per Aksi</span>
+                    <input type="checkbox" id="autoWebhookToggle" checked class="w-4 h-4 accent-red-600 rounded cursor-pointer">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="testWebhook()" type="button" class="bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-700 text-indigo-300 font-bold py-2.5 rounded-lg text-xs uppercase tracking-wider transition">
+                        <i class="fa-solid fa-paper-plane mr-1"></i> Tes Ping
+                    </button>
+                    <button onclick="saveWebhookSettings()" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg text-xs uppercase tracking-wider transition">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan URL
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default items list
+        const defaultItems = [
+            { id: '1', name: 'TEMBAGA', category: 'mentah', qty: 2121, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/11748_b.jpg' },
+            { id: '2', name: 'BESI', category: 'mentah', qty: 84, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19809_b.jpg' },
+            { id: '3', name: 'MATERIAL', category: 'mentah', qty: 687, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19843_b.jpg' },
+            { id: '4', name: 'MICIN', category: 'mentah', qty: 608, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/1264_b.jpg' },
+            { id: '5', name: 'GULA', category: 'mentah', qty: 638, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/1575_b.jpg' },
+            { id: '6', name: 'AIR MINERAL', category: 'mentah', qty: 142, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19570_b.jpg' },
+            { id: '7', name: 'KACA', category: 'mentah', qty: 2637, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/1649_b.jpg' },
+            { id: '8', name: 'BOTOL', category: 'mentah', qty: 142, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19570_b.jpg' },
+            { id: '10', name: 'KEVLAR', category: 'jadi', qty: 93, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19515_b.jpg' },
+            { id: '11', name: 'ANGGUR MERAH', category: 'jadi', qty: 8, unit: 'Botol', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/1669_b.jpg' },
+            { id: '12', name: 'BEER', category: 'persenjataan', qty: 4, unit: 'Botol', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19824_b.jpg' },
+            { id: '13', name: 'DESERT EAGLE ', category: 'persenjataan', qty: 306, unit: 'Pcs', image: 'https://dev.prineside.com/en/gtasa_samp_model_id/model/348-desert_eagle/' },
+            { id: '14', name: 'AK47', category: 'persenjataan', qty: 200, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/355_b.jpg' },
+            { id: '15', name: 'SHOTGUN', category: 'persenjataan', qty: 390, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/349_b.jpg' },
+            { id: '16', name: 'TEC 9', category: 'persenjataan', qty: 30, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/347_b.jpg' },
+            { id: '17', name: 'SILENCED', category: 'persenjataan', qty: 0, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/349_b.jpg' },
+            { id: '18', name: 'Emas Batangan Safe Reserve', category: 'brankas', qty: 500, unit: 'Gram', image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&auto=format&fit=crop&q=60' }
+        ];
+
+        // App State
+        let activeTab = 'mentah';
+        let stockActionType = 'IN'; // 'IN' or 'OUT'
+        let currentUser = localStorage.getItem('biker_user') || null;
+        let webhookUrl = localStorage.getItem('biker_webhook') || 'https://discord.com/api/webhooks/1536094807557152869/YIGzQRhwc-xD-Y-UTEej1LR6PiXOjICRUmXYMbfn6UXB2aLHh9qze0rsq693eOl1lVTJ';
+        
+        let items = JSON.parse(localStorage.getItem('biker_items')) || defaultItems;
+        let logs = JSON.parse(localStorage.getItem('biker_logs')) || [];
+        let cashlogs = JSON.parse(localStorage.getItem('biker_cashlogs')) || [];
+        let vaultCash = parseInt(localStorage.getItem('biker_vault_cash')) || 23395055;
+        let redCash = parseInt(localStorage.getItem('biker_red_cash')) || 200000;
+        let pendingWebhookLogs = JSON.parse(localStorage.getItem('biker_pending_webhooks')) || [];
+
+        // LOADING OVERLAY CONTROLLER
+        function showLoader(title = "MEMPROSES DATA...", subtext = "Mohon tunggu sebentar...", minDurationMs = 500, callback = null) {
+            const overlay = document.getElementById('actionLoadingOverlay');
+            const titleElem = document.getElementById('actionLoadingTitle');
+            const subtextElem = document.getElementById('actionLoadingSubtext');
+            const progressBar = document.getElementById('actionProgressBar');
+
+            if (titleElem) titleElem.textContent = title;
+            if (subtextElem) subtextElem.textContent = subtext;
+            if (progressBar) progressBar.style.width = '0%';
+
+            if (overlay) overlay.classList.remove('hidden');
+
+            setTimeout(() => { if (progressBar) progressBar.style.width = '70%'; }, 50);
+
+            if (minDurationMs > 0) {
+                setTimeout(() => {
+                    if (progressBar) progressBar.style.width = '100%';
+                    setTimeout(() => {
+                        hideLoader();
+                        if (typeof callback === 'function') callback();
+                    }, 180);
+                }, minDurationMs);
+            } else if (typeof callback === 'function') {
+                callback();
+            }
+        }
+
+        function hideLoader() {
+            const overlay = document.getElementById('actionLoadingOverlay');
+            if (overlay) overlay.classList.add('hidden');
+        }
+
+        // SIDEBAR DRAWER CONTROLS
+        function openSidebar() {
+            const drawer = document.getElementById('sidebarDrawer');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (drawer) drawer.classList.remove('-translate-x-full');
+            if (backdrop) {
+                backdrop.classList.remove('opacity-0', 'pointer-events-none');
+                backdrop.classList.add('opacity-100');
+            }
+        }
+
+        function closeSidebar() {
+            const drawer = document.getElementById('sidebarDrawer');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (drawer) drawer.classList.add('-translate-x-full');
+            if (backdrop) {
+                backdrop.classList.remove('opacity-100');
+                backdrop.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        // SPLASH SCREEN & AUTH
+        function closeSplash() {
+            sessionStorage.setItem('splash_seen', 'true');
+            const splashScreen = document.getElementById('splashScreen');
+            if (splashScreen) splashScreen.classList.add('hidden');
+            checkAuth();
+        }
+
+        function checkAuth() {
+            const mainContent = document.getElementById('mainContent');
+            const loginScreen = document.getElementById('loginScreen');
+
+            if (currentUser) {
+                if (loginScreen) loginScreen.classList.add('hidden');
+                if (mainContent) mainContent.classList.remove('hidden');
+                
+                const userBadge = document.getElementById('userBadgeSidebar');
+                if (userBadge) userBadge.textContent = currentUser.toUpperCase();
+                
+                renderAll();
+            } else {
+                if (mainContent) mainContent.classList.add('hidden');
+                if (loginScreen) loginScreen.classList.remove('hidden');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+
+            showLoader("MENGOTENTIKASI...", "Memeriksa Kredensial Club...", 600, () => {
+                if ((user.toLowerCase() === 'presiden' || user.toLowerCase() === 'president' || user.length > 0) && pass === '123456') {
+                    currentUser = user;
+                    localStorage.setItem('biker_user', currentUser);
+                    checkAuth();
+                    addLog('LOGIN SYSTEM', `Member ${user} berhasil masuk ke repository.`);
+                } else {
+                    showErrorModal('Username atau Password yang Anda masukkan salah! (Default Password: 123456)');
+                }
+            });
+        }
+
+        function logout() {
+            showLoader("LOGOUT...", "Keluar dari sistem...", 400, () => {
+                currentUser = null;
+                localStorage.removeItem('biker_user');
+                closeSidebar();
+                checkAuth();
+            });
+        }
+
+        function showErrorModal(msg) {
+            const errorModal = document.getElementById('errorModal');
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorMessage) errorMessage.textContent = msg;
+            if (errorModal) errorModal.classList.remove('hidden');
+        }
+
+        function closeErrorModal() {
+            const errorModal = document.getElementById('errorModal');
+            if (errorModal) errorModal.classList.add('hidden');
+            const loginPass = document.getElementById('loginPass');
+            if (loginPass) {
+                loginPass.value = '';
+                loginPass.focus();
+            }
+        }
+
+        // FILE UPLOAD HANDLERS
+        function handleImageFileSelect(event, textInputId, previewImgId, labelId) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 3 * 1024 * 1024) {
+                showErrorModal('Ukuran file terlalu besar! Gunakan gambar dengan ukuran di bawah 3MB.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                const textInput = document.getElementById(textInputId);
+                const previewImg = document.getElementById(previewImgId);
+                const labelElem = document.getElementById(labelId);
+                
+                if (textInput) textInput.value = dataUrl;
+                if (previewImg) {
+                    previewImg.src = dataUrl;
+                    const container = previewImg.closest('div[id$="Container"]');
+                    if (container) container.classList.remove('hidden');
+                }
+                if (labelElem) labelElem.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearImageSelect(textInputId, containerId, fileInputId, labelId) {
+            const textInput = document.getElementById(textInputId);
+            const container = document.getElementById(containerId);
+            const fileInput = document.getElementById(fileInputId);
+            const labelElem = document.getElementById(labelId);
+
+            if (textInput) textInput.value = '';
+            if (container) container.classList.add('hidden');
+            if (fileInput) fileInput.value = '';
+            if (labelElem) labelElem.textContent = 'Pilih File Gambar...';
+        }
+
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                const splashLogo = document.getElementById('splashLogo');
+                const appBarLogo = document.getElementById('appBarLogo');
+                const sidebarLogo = document.getElementById('sidebarLogo');
+                if (splashLogo) splashLogo.src = dataUrl;
+                if (appBarLogo) appBarLogo.src = dataUrl;
+                if (sidebarLogo) sidebarLogo.src = dataUrl;
+                localStorage.setItem('biker_custom_logo', dataUrl);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Initialize App
+        window.onload = function() {
+            // Restore custom logo if saved
+            const savedLogo = localStorage.getItem('biker_custom_logo');
+            if (savedLogo) {
+                const splashLogo = document.getElementById('splashLogo');
+                const appBarLogo = document.getElementById('appBarLogo');
+                const sidebarLogo = document.getElementById('sidebarLogo');
+                if (splashLogo) splashLogo.src = savedLogo;
+                if (appBarLogo) appBarLogo.src = savedLogo;
+                if (sidebarLogo) sidebarLogo.src = savedLogo;
+            }
+
+            // Check Splash visibility
+            const splashSeen = sessionStorage.getItem('splash_seen');
+            if (splashSeen) {
+                const splashScreen = document.getElementById('splashScreen');
+                if (splashScreen) splashScreen.classList.add('hidden');
+                checkAuth();
+            } else {
+                const mainContent = document.getElementById('mainContent');
+                const loginScreen = document.getElementById('loginScreen');
+                if (mainContent) mainContent.classList.add('hidden');
+                if (loginScreen) loginScreen.classList.add('hidden');
+            }
+
+            const whInput = document.getElementById('webhookInput');
+            if (whInput) whInput.value = webhookUrl;
+
+            renderAll();
+        };
+
+        // NAVIGATION SWITCH TAB
+        function switchTab(tab) {
+            showLoader("MEMUAT...", `Membuka modul ${tab.toUpperCase()}...`, 250, () => {
+                activeTab = tab;
+                
+                // Active Nav Styling
+                const tabs = ['mentah', 'jadi', 'persenjataan', 'brankas', 'keuangan'];
+                tabs.forEach(t => {
+                    const btn = document.getElementById(`nav-${t}`);
+                    if (btn) {
+                        if (t === tab) {
+                            btn.className = "nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-white bg-red-600 shadow-md";
+                        } else {
+                            btn.className = "nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-slate-400 hover:bg-slate-800/60 hover:text-white";
+                        }
+                    }
+                });
+
+                const activeTitle = document.getElementById('activeSectionTitle');
+                if (activeTitle) {
+                    const titles = {
+                        'mentah': 'BARANG MENTAH',
+                        'jadi': 'BARANG JADI',
+                        'persenjataan': 'PERSENJATAAN / ARMORY',
+                        'brankas': 'BRANKAS ASSET',
+                        'keuangan': 'KEUANGAN & KAS'
+                    };
+                    activeTitle.textContent = titles[tab] || tab.toUpperCase();
+                }
+
+                closeSidebar();
+                renderAll();
+            });
+        }
+
+        // PENDING WEBHOOK UI UPDATER
+        function updatePendingWebhookUI() {
+            const btn = document.getElementById('sendPendingWebhookBtn');
+            const badge = document.getElementById('pendingCountBadge');
+            const count = pendingWebhookLogs ? pendingWebhookLogs.length : 0;
+
+            if (badge) badge.textContent = count;
+            if (btn) {
+                if (count > 0) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            }
+        }
+
+        // RENDER ALL DATA UI
+        function renderAll() {
+            renderStats();
+            renderInventory();
+            renderCashflow();
+            renderLogs();
+            updatePendingWebhookUI();
+        }
+
+        function renderStats() {
+            const rawCount = items.filter(i => i.category === 'mentah').reduce((a, b) => a + Number(b.qty), 0);
+            const finishedCount = items.filter(i => i.category === 'jadi').reduce((a, b) => a + Number(b.qty), 0);
+            const weaponCount = items.filter(i => i.category === 'persenjataan').reduce((a, b) => a + Number(b.qty), 0);
+
+            const statVault = document.getElementById('statVault');
+            const statRedVault = document.getElementById('statRedVault');
+            const statWeapons = document.getElementById('statWeapons');
+            const statRaw = document.getElementById('statRaw');
+            const statFinished = document.getElementById('statFinished');
+
+            if (statVault) statVault.textContent = `Rp ${vaultCash.toLocaleString('id-ID')}`;
+            if (statRedVault) statRedVault.textContent = `Rp ${redCash.toLocaleString('id-ID')}`;
+            if (statWeapons) statWeapons.textContent = `${weaponCount} Item`;
+            if (statRaw) statRaw.textContent = `${rawCount} Stok`;
+            if (statFinished) statFinished.textContent = `${finishedCount} Stok`;
+        }
+
+        function renderInventory() {
+            const container = document.getElementById('inventoryContainer');
+            const keuanganContainer = document.getElementById('keuanganContainer');
+            if (!container) return;
+
+            if (activeTab === 'keuangan') {
+                container.classList.add('hidden');
+                if (keuanganContainer) keuanganContainer.classList.remove('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            if (keuanganContainer) keuanganContainer.classList.add('hidden');
+
+            const filteredItems = items.filter(i => i.category === activeTab);
+            container.innerHTML = '';
+
+            if (filteredItems.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-biker-card border border-biker-border rounded-xl p-6">
+                        <i class="fa-solid fa-box-open text-4xl text-slate-600 mb-2"></i>
+                        <p class="text-sm text-slate-400">Belum ada data barang untuk kategori ini.</p>
+                        <button onclick="openAddItemModal()" class="mt-3 bg-red-600 text-white text-xs px-4 py-2 rounded-lg uppercase tracking-wider font-bold">
+                            + Tambah Barang Pertama
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-biker-card border border-biker-border rounded-xl p-4 flex flex-col justify-between hover:border-red-900/60 transition shadow-lg relative group";
+                card.innerHTML = `
+                    <div>
+                        <div class="relative w-full h-36 bg-slate-900 rounded-lg overflow-hidden mb-3 border border-slate-800">
+                            <img src="${item.image || 'https://placehold.co/400x300/1e293b/ffffff?text=NO+IMAGE'}" 
+                                 alt="${item.name}" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                                 onerror="this.src='https://placehold.co/400x300/1e293b/ffffff?text=NO+IMAGE'">
+                            <span class="absolute top-2 right-2 bg-black/75 backdrop-blur text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded border border-slate-700 uppercase">
+                                ${item.unit}
+                            </span>
+                        </div>
+                        <h4 class="font-bikerTitle text-lg text-white tracking-wider leading-tight uppercase mb-1">${item.name}</h4>
+                        <div class="flex items-baseline gap-2 mb-3">
+                            <span class="text-2xl font-bold font-mono text-red-500">${item.qty}</span>
+                            <span class="text-xs text-slate-400 font-mono">${item.unit} Tersedia</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-800">
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button onclick="quickStockAdjust('${item.id}', 1)" class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 py-1.5 rounded text-xs font-bold transition flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-plus text-[10px]"></i> 1
+                            </button>
+                            <button onclick="quickStockAdjust('${item.id}', -1)" class="bg-red-950/80 hover:bg-red-900 border border-red-800 text-red-400 py-1.5 rounded text-xs font-bold transition flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-minus text-[10px]"></i> 1
+                            </button>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="openStockModal('${item.id}', 'IN')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-1.5 rounded text-xs font-bold transition uppercase tracking-wider">
+                                Adjust Stok
+                            </button>
+                            <button onclick="openEditItemModal('${item.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded transition" title="Edit Item">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deleteItem('${item.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-red-400 rounded transition" title="Hapus Item">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderCashflow() {
+            const container = document.getElementById('cashflowLogs');
+            if (!container) return;
+
+            container.innerHTML = '';
+            if (cashlogs.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Belum ada catatan transaksi keuangan.</p>`;
+                return;
+            }
+
+            cashlogs.forEach(log => {
+                const item = document.createElement('div');
+                const isClean = log.currency === 'CLEAN';
+                const isIncome = log.type === 'IN';
+
+                item.className = `p-3 rounded-lg border text-xs flex flex-col md:flex-row md:items-center justify-between gap-2 ${
+                    isClean 
+                        ? 'bg-slate-900/80 border-slate-800' 
+                        : 'bg-red-950/30 border-red-900/40'
+                }`;
+
+                item.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                            isIncome ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-red-950 text-red-400 border border-red-800'
+                        }">
+                            <i class="fa-solid ${isIncome ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-white uppercase">${log.category}</span>
+                                <span class="text-[9px] px-1.5 py-0.5 rounded font-mono ${
+                                    isClean ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-red-900 text-red-200 border border-red-700'
+                                }">
+                                    ${isClean ? '💵 CLEAN' : '🔴 RED MONEY'}
+                                </span>
+                            </div>
+                            <p class="text-slate-400 text-[11px] mt-0.5">${log.notes || 'Tanpa Catatan'}</p>
+                            <span class="text-[10px] text-slate-500 font-mono">${log.timestamp} • PJ: ${log.user}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between md:justify-end gap-3 border-t md:border-0 border-slate-800/80 pt-2 md:pt-0">
+                        ${log.proof ? `
+                            <a href="${log.proof}" target="_blank" class="text-[11px] text-amber-400 hover:underline flex items-center gap-1 bg-amber-950/40 px-2 py-1 rounded border border-amber-900/50">
+                                <i class="fa-solid fa-image"></i> Bukti Struk
+                            </a>
+                        ` : ''}
+                        <div class="text-right">
+                            <span class="font-bold font-mono text-sm block ${isIncome ? 'text-emerald-400' : 'text-red-400'}">
+                                ${isIncome ? '+' : '-'} Rp ${log.amount.toLocaleString('id-ID')}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('activityLogs');
+            if (!container) return;
+
+            container.innerHTML = '';
+            if (logs.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Belum ada riwayat log aktivitas.</p>`;
+                return;
+            }
+
+            logs.slice(0, 30).forEach(log => {
+                const item = document.createElement('div');
+                item.className = "py-1.5 border-b border-slate-800/60 flex items-start justify-between gap-2 text-[11px]";
+                item.innerHTML = `
+                    <div>
+                        <span class="text-red-500 font-bold uppercase mr-1">[${log.action}]</span>
+                        <span class="text-slate-300">${log.detail}</span>
+                        ${log.proof ? `<a href="${log.proof}" target="_blank" class="ml-2 text-amber-400 hover:underline font-semibold"><i class="fa-solid fa-image"></i> Lihat Bukti</a>` : ''}
+                    </div>
+                    <span class="text-[10px] text-slate-500 font-mono whitespace-nowrap">${log.timestamp}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function saveItems() {
+            localStorage.setItem('biker_items', JSON.stringify(items));
+            renderAll();
+        }
+
+        function addLog(action, detail, proof = null) {
+            const timestamp = new Date().toLocaleString('id-ID');
+            logs.unshift({ action, detail, proof, timestamp, user: currentUser || 'System' });
+            localStorage.setItem('biker_logs', JSON.stringify(logs));
+            renderLogs();
+        }
+
+        // QUICK STOK ADJUST (+1 / -1)
+        function quickStockAdjust(id, delta) {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+
+            if (delta < 0 && item.qty + delta < 0) {
+                showErrorModal(`Stok "${item.name}" sudah 0! Tidak bisa dikurangi.`);
+                return;
+            }
+
+            item.qty += delta;
+            saveItems();
+
+            const actionLabel = delta > 0 ? 'BARANG MASUK (+)' : 'BARANG KELUAR (-)';
+            addLog(actionLabel, `${item.name}: ${delta > 0 ? '+' : ''}${delta} ${item.unit}`);
+            
+            queueWebhookNotification(`📋 **Quick Update Stok**\n**Action:** ${actionLabel}\n**Item:** ${item.name}\n**Jumlah:** ${delta > 0 ? '+' : ''}${delta} ${item.unit}\n**Sisa Stok:** ${item.qty} ${item.unit}\n**User:** ${currentUser || 'System'}`);
+        }
+
+        // MODAL ITEM HANDLERS
+        function openAddItemModal() {
+            const modal = document.getElementById('itemModal');
+            const form = document.getElementById('itemForm');
+            const title = document.getElementById('modalTitle');
+            if (form) form.reset();
+            const itemId = document.getElementById('itemId');
+            if (itemId) itemId.value = '';
+            if (title) title.textContent = 'TAMBAH ITEM BARU';
+            clearImageSelect('itemImage', 'itemImagePreviewContainer', 'itemFileInput', 'itemFileLabel');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function openEditItemModal(id) {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+
+            const modal = document.getElementById('itemModal');
+            const title = document.getElementById('modalTitle');
+            
+            document.getElementById('itemId').value = item.id;
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemCategory').value = item.category;
+            document.getElementById('itemQty').value = item.qty;
+            document.getElementById('itemUnit').value = item.unit;
+            document.getElementById('itemImage').value = item.image || '';
+
+            if (item.image) {
+                const previewImg = document.getElementById('itemImagePreview');
+                const container = document.getElementById('itemImagePreviewContainer');
+                if (previewImg) previewImg.src = item.image;
+                if (container) container.classList.remove('hidden');
+            } else {
+                clearImageSelect('itemImage', 'itemImagePreviewContainer', 'itemFileInput', 'itemFileLabel');
+            }
+
+            if (title) title.textContent = 'EDIT DATA ITEM';
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeItemModal() {
+            const modal = document.getElementById('itemModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function saveItem(e) {
+            e.preventDefault();
+            const id = document.getElementById('itemId').value || Date.now().toString();
+            const name = document.getElementById('itemName').value.trim();
+            const category = document.getElementById('itemCategory').value;
+            const qty = parseInt(document.getElementById('itemQty').value) || 0;
+            const unit = document.getElementById('itemUnit').value.trim() || 'Pcs';
+            const image = document.getElementById('itemImage').value.trim();
+
+            showLoader('MENYIMPAN DATA...', `Menyimpan item ${name}...`, 400, () => {
+                const existingIndex = items.findIndex(i => i.id === id);
+                if (existingIndex > -1) {
+                    items[existingIndex] = { id, name, category, qty, unit, image };
+                    addLog('EDIT ITEM', `Pembaruan data item ${name}`);
+                } else {
+                    items.push({ id, name, category, qty, unit, image });
+                    addLog('TAMBAH ITEM', `Menambahkan item baru ${name} (${qty} ${unit})`);
+                }
+
+                saveItems();
+                closeItemModal();
+                queueWebhookNotification(`📦 **Barang Ditambahkan/Diperbarui**\n**Nama:** ${name}\n**Stok:** ${qty} ${unit}\n**Oleh:** ${currentUser || 'System'}`);
+            });
+        }
+
+        function deleteItem(id) {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+
+            if (confirm(`Apakah Anda yakin ingin menghapus item "${item.name}"?`)) {
+                showLoader('MENGHAPUS ITEM...', `Menghapus ${item.name}...`, 300, () => {
+                    items = items.filter(i => i.id !== id);
+                    saveItems();
+                    addLog('HAPUS ITEM', `Menghapus item ${item.name}`);
+                    queueWebhookNotification(`🗑️ **Barang Dihapus**\n**Nama:** ${item.name}\n**Oleh:** ${currentUser || 'System'}`);
+                });
+            }
+        }
+
+        // STOCK MODAL CONTROLS
+        function openStockModal(id, actionType = 'IN') {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+
+            stockActionType = actionType;
+            document.getElementById('stockModalItemId').value = item.id;
+            document.getElementById('stockModalItemInfo').textContent = `${item.name} • Sisa Stok: ${item.qty} ${item.unit}`;
+            document.getElementById('stockModalAmount').value = 1;
+            document.getElementById('stockModalNotes').value = '';
+            clearImageSelect('stockProofImage', 'stockProofPreviewContainer', 'stockFileInput', 'stockFileLabel');
+
+            setStockActionType(actionType);
+            const modal = document.getElementById('stockModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function setStockActionType(type) {
+            stockActionType = type;
+            const inBtn = document.getElementById('stockActionInBtn');
+            const outBtn = document.getElementById('stockActionOutBtn');
+
+            if (type === 'IN') {
+                if (inBtn) inBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition bg-emerald-600 text-white shadow";
+                if (outBtn) outBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition text-slate-400 hover:text-white";
+            } else {
+                if (inBtn) inBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition text-slate-400 hover:text-white";
+                if (outBtn) outBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition bg-red-600 text-white shadow";
+            }
+        }
+
+        function closeStockModal() {
+            const modal = document.getElementById('stockModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function confirmStockChange() {
+            const id = document.getElementById('stockModalItemId').value;
+            const amount = parseInt(document.getElementById('stockModalAmount').value) || 0;
+            const notes = document.getElementById('stockModalNotes').value.trim() || 'Tanpa catatan';
+            const proof = document.getElementById('stockProofImage') ? document.getElementById('stockProofImage').value.trim() : '';
+            const item = items.find(i => i.id === id);
+
+            if (!item || amount <= 0) return;
+
+            if (stockActionType === 'OUT' && item.qty < amount) {
+                showErrorModal(`Stok "${item.name}" tidak mencukupi! Sisa stok saat ini: ${item.qty} ${item.unit}.`);
+                return;
+            }
+
+            showLoader('MENGUPDATE STOK...', `Memproses transaksi stok ${item.name}...`, 400, () => {
+                if (stockActionType === 'IN') {
+                    item.qty += amount;
+                } else {
+                    item.qty -= amount;
+                }
+
+                saveItems();
+                closeStockModal();
+
+                const actionLabel = stockActionType === 'IN' ? 'BARANG MASUK (+)' : 'BARANG KELUAR (-)';
+                addLog(actionLabel, `${item.name}: ${amount} ${item.unit}. Ket: ${notes}`, proof);
+                
+                queueWebhookNotification(`📋 **Laporan Keluar/Masuk Barang**\n**Status:** ${actionLabel}\n**Item:** ${item.name}\n**Jumlah:** ${amount} ${item.unit}\n**Stok Sekarang:** ${item.qty} ${item.unit}\n**Catatan:** ${notes}\n**PJ/User:** ${currentUser || 'System'}`, proof);
+            });
+        }
+
+        // FINANCIAL / CASHFLOW HANDLER
+        function addCashflow(e) {
+            e.preventDefault();
+            const currency = document.getElementById('cashCurrency').value;
+            const type = document.getElementById('cashType').value;
+            const category = document.getElementById('cashCategory').value;
+            const amount = parseInt(document.getElementById('cashAmount').value) || 0;
+            const proof = document.getElementById('cashProofImage').value.trim();
+            const notes = document.getElementById('cashNotes').value.trim();
+
+            if (amount <= 0) {
+                showErrorModal('Masukkan nominal uang yang valid!');
+                return;
+            }
+
+            if (type === 'OUT') {
+                if (currency === 'CLEAN' && vaultCash < amount) {
+                    showErrorModal('Saldo Brankas Uang Clean tidak mencukupi!');
+                    return;
+                }
+                if (currency === 'RED' && redCash < amount) {
+                    showErrorModal('Saldo Kas Uang Merah tidak mencukupi!');
+                    return;
+                }
+            }
+
+            showLoader('PENCATATAN KAS...', 'Menyimpan transaksi keuangan...', 400, () => {
+                if (currency === 'CLEAN') {
+                    vaultCash = type === 'IN' ? vaultCash + amount : vaultCash - amount;
+                    localStorage.setItem('biker_vault_cash', vaultCash);
+                } else {
+                    redCash = type === 'IN' ? redCash + amount : redCash - amount;
+                    localStorage.setItem('biker_red_cash', redCash);
+                }
+
+                const timestamp = new Date().toLocaleString('id-ID');
+                const logEntry = { currency, type, category, amount, proof, notes, timestamp, user: currentUser || 'System' };
+                cashlogs.unshift(logEntry);
+                localStorage.setItem('biker_cashlogs', JSON.stringify(cashlogs));
+
+                document.getElementById('cashAmount').value = '';
+                document.getElementById('cashNotes').value = '';
+                clearImageSelect('cashProofImage', 'cashProofPreviewContainer', 'cashFileInput', 'cashFileLabel');
+
+                renderAll();
+
+                const actionLabel = `KAS ${currency} (${type === 'IN' ? 'MASUK' : 'KELUAR'})`;
+                addLog(actionLabel, `${category}: Rp ${amount.toLocaleString('id-ID')}`);
+
+                queueWebhookNotification(`💵 **Laporan Kas Keuangan**\n**Kategori Kas:** ${currency === 'CLEAN' ? 'Uang Clean' : 'Uang Merah'}\n**Tipe:** ${type === 'IN' ? 'Pemasukan (+)' : 'Pengeluaran (-)'}\n**Keperluan:** ${category}\n**Jumlah:** Rp ${amount.toLocaleString('id-ID')}\n**Catatan:** ${notes || '-'}\n**PJ/User:** ${currentUser || 'System'}`, proof);
+            });
+        }
+
+        function clearCashLogs() {
+            if (confirm('Bersihkan seluruh catatan riwayat kas?')) {
+                cashlogs = [];
+                localStorage.removeItem('biker_cashlogs');
+                renderAll();
+                addLog('RESET KAS LOG', 'Riwayat catatan kas telah direset.');
+            }
+        }
+
+        function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: mimeString });
+        }
+
+        function executeDiscordSend(payload, proofImage = null, successCallback = null) {
+            if (!webhookUrl) {
+                showErrorModal('Discord Webhook URL belum diisi! Silakan isi URL Webhook di menu Pengaturan.');
+                return;
+            }
+
+            let fetchOptions = {};
+
+            if (proofImage && proofImage.startsWith('data:image/')) {
+                try {
+                    const blob = dataURItoBlob(proofImage);
+                    const formData = new FormData();
+                    formData.append('files[0]', blob, 'bukti_foto.png');
+                    
+                    if (payload.embeds && payload.embeds.length > 0) {
+                        payload.embeds[0].image = { url: 'attachment://bukti_foto.png' };
+                    }
+                    
+                    formData.append('payload_json', JSON.stringify(payload));
+                    fetchOptions = {
+                        method: 'POST',
+                        body: formData
+                    };
+                } catch (e) {
+                    console.error('Error attaching image:', e);
+                    fetchOptions = {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    };
+                }
+            } else {
+                if (proofImage && (proofImage.startsWith('http://') || proofImage.startsWith('https://'))) {
+                    if (payload.embeds && payload.embeds.length > 0) {
+                        payload.embeds[0].image = { url: proofImage };
+                    }
+                }
+                fetchOptions = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                };
+            }
+
+            fetch(webhookUrl, fetchOptions)
+            .then(res => {
+                if (res.ok || res.status === 204) {
+                    if (typeof successCallback === 'function') successCallback();
+                } else {
+                    showErrorModal(`Gagal membroadcast ke Discord! HTTP Status ${res.status}`);
+                }
+            })
+            .catch(() => {
+                showErrorModal('Terjadi kesalahan jaringan saat berusaha menghubungi Discord Webhook.');
+            });
+        }
+
+        function queueWebhookNotification(text, proof = null) {
+            const timestamp = new Date().toLocaleTimeString('id-ID');
+            pendingWebhookLogs.push({ text, proof, timestamp });
+            localStorage.setItem('biker_pending_webhooks', JSON.stringify(pendingWebhookLogs));
+            updatePendingWebhookUI();
+
+            const isAutoSend = document.getElementById('autoWebhookToggle') ? document.getElementById('autoWebhookToggle').checked : true;
+            
+            if (isAutoSend && webhookUrl) {
+                const itemProof = proof;
+                const payload = {
+                    username: "WESGATH MC BOT",
+                    avatar_url: "https://i.imgur.com/xdrO148.png",
+                    embeds: [{
+                        title: "🏍️ WESGATH MC - NOTIFIKASI BARU",
+                        description: text + (itemProof ? `\n📷 **Bukti Foto:** Terlampir` : ''),
+                        color: 14423100,
+                        footer: {
+                            text: "WESGATH MC Management • " + new Date().toLocaleString('id-ID')
+                        }
+                    }]
+                };
+
+                executeDiscordSend(payload, itemProof, () => {
+                    pendingWebhookLogs.pop();
+                    localStorage.setItem('biker_pending_webhooks', JSON.stringify(pendingWebhookLogs));
+                    updatePendingWebhookUI();
+                });
+            }
+        }
+
+        function sendPendingWebhooks() {
+            if (pendingWebhookLogs.length === 0) {
+                showErrorModal('Tidak ada log terpending yang perlu dikirim ke Discord.');
+                return;
+            }
+
+            if (!webhookUrl) {
+                openWebhookModal();
+                return;
+            }
+
+            showLoader('MENGIRIM DISCORD...', 'Mengirim rangkuman log ke Discord Webhook...', 0);
+
+            let combinedMessage = `📋 **RANGKUMAN LOG PERUBAHAN (${pendingWebhookLogs.length} Aktivitas)**\n\n`;
+            let proofToAttach = null;
+
+            pendingWebhookLogs.forEach((item, index) => {
+                combinedMessage += `**[#${index + 1} - ${item.timestamp}]**\n${item.text}\n`;
+                if (item.proof) {
+                    combinedMessage += `📷 **Bukti Foto:** Terlampir\n`;
+                    if (!proofToAttach) proofToAttach = item.proof;
+                }
+                combinedMessage += `───────────────\n`;
+            });
+
+            const payload = {
+                username: "WESGATH MC BOT",
+                avatar_url: "https://i.imgur.com/xdrO148.png",
+                embeds: [{
+                    title: "🏍️ WESGATH MC - BATCH LOG REPORT",
+                    description: combinedMessage.substring(0, 4000),
+                    color: 14423100,
+                    footer: {
+                        text: "Dikirim oleh: " + (currentUser || 'System') + " • " + new Date().toLocaleString('id-ID')
+                    }
+                }]
+            };
+
+            executeDiscordSend(payload, proofToAttach, () => {
+                hideLoader();
+                pendingWebhookLogs = [];
+                localStorage.removeItem('biker_pending_webhooks');
+                updatePendingWebhookUI();
+                showLoader('SUKSES', 'Berhasil mengirim laporan log ke Discord!', 1000);
+            });
+        }
+
+        function sendFullReportWebhook() {
+            if (!webhookUrl) {
+                openWebhookModal();
+                return;
+            }
+
+            showLoader('MENGIRIM LAPORAN...', 'Menyiapkan & mengirim Laporan Total ke Discord...', 0);
+
+            const rawItems = items.filter(i => i.category === 'mentah');
+            const finishedItems = items.filter(i => i.category === 'jadi');
+            const weapons = items.filter(i => i.category === 'persenjataan');
+            const safeAssets = items.filter(i => i.category === 'brankas');
+
+            let reportText = `💵 **KAS & KEUANGAN**\n`;
+            reportText += `• Kas Regular: Rp ${vaultCash.toLocaleString('id-ID')}\n`;
+            reportText += `• Uang Merah: Rp ${redCash.toLocaleString('id-ID')}\n\n`;
+
+            reportText += `📦 **BARANG MENTAH**\n`;
+            if (rawItems.length > 0) {
+                rawItems.forEach(i => { reportText += `• ${i.name}: ${i.qty} ${i.unit}\n`; });
+            } else {
+                reportText += `• Kosong\n`;
+            }
+
+            reportText += `\n📦 **BARANG JADI**\n`;
+            if (finishedItems.length > 0) {
+                finishedItems.forEach(i => { reportText += `• ${i.name}: ${i.qty} ${i.unit}\n`; });
+            } else {
+                reportText += `• Kosong\n`;
+            }
+
+            reportText += `\n🔫 **PERSENJATAAN**\n`;
+            if (weapons.length > 0) {
+                weapons.forEach(i => { reportText += `• ${i.name}: ${i.qty} ${i.unit}\n`; });
+            } else {
+                reportText += `• Kosong\n`;
+            }
+
+            if (safeAssets.length > 0) {
+                reportText += `\n🏦 **BRANKAS VALUABLES**\n`;
+                safeAssets.forEach(i => { reportText += `• ${i.name}: ${i.qty} ${i.unit}\n`; });
+            }
+
+            const payload = {
+                username: "WESGATH MC BOT",
+                avatar_url: "https://i.imgur.com/xdrO148.png",
+                embeds: [{
+                    title: "📊 WESGATH MC - LAPORAN TOTAL INVENTARIS & KAS",
+                    description: reportText.substring(0, 4000),
+                    color: 15158332,
+                    footer: {
+                        text: "Laporan Dibuat Oleh: " + (currentUser || 'System') + " • " + new Date().toLocaleString('id-ID')
+                    }
+                }]
+            };
+
+            executeDiscordSend(payload, null, () => {
+                hideLoader();
+                showLoader('SUKSES', 'Laporan Total berhasil dikirim ke Discord!', 1000);
+            });
+        }
+
+        function testWebhook() {
+            const inputUrl = document.getElementById('webhookInput').value.trim() || webhookUrl;
+            if (!inputUrl) {
+                showErrorModal('Silakan masukkan URL Webhook Discord terlebih dahulu!');
+                return;
+            }
+            showLoader('TES WEBHOOK...', 'Mengirim pesan tes ke Discord...', 0);
+            const payload = {
+                username: "WESGATH MC BOT",
+                avatar_url: "https://i.imgur.com/xdrO148.png",
+                embeds: [{
+                    title: "🔔 TEST NOTIFIKASI WEBHOOK",
+                    description: "Jika Anda melihat pesan ini, integrasi Webhook Discord WESGATH MC berfungsi dengan baik!",
+                    color: 3066993,
+                    footer: {
+                        text: "Diuji oleh: " + (currentUser || 'System') + " • " + new Date().toLocaleString('id-ID')
+                    }
+                }]
+            };
+            fetch(inputUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => {
+                hideLoader();
+                if (res.ok || res.status === 204) {
+                    showLoader('BERHASIL', 'Tes Ping Webhook Discord Berhasil!', 800);
+                } else {
+                    showErrorModal(`Gagal melakukan tes ping Webhook. Status HTTP ${res.status}`);
+                }
+            })
+            .catch(() => {
+                hideLoader();
+                showErrorModal('Gagal menghubungi Webhook URL. Pastikan koneksi internet stabil.');
+            });
+        }
+
+        // WEBHOOK MODAL CONTROLS
+        function openWebhookModal() {
+            const input = document.getElementById('webhookInput');
+            if (input) input.value = webhookUrl;
+            const modal = document.getElementById('webhookModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeWebhookModal() {
+            const modal = document.getElementById('webhookModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function saveWebhookSettings() {
+            const newUrl = document.getElementById('webhookInput').value.trim();
+            webhookUrl = newUrl;
+            localStorage.setItem('biker_webhook', webhookUrl);
+            showLoader('TERSIMPAN', 'Pengaturan Webhook berhasil disimpan!', 800, () => {
+                closeWebhookModal();
+            });
+        }
+    </script>
+</body>
+</html>
