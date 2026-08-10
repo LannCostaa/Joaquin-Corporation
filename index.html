@@ -177,8 +177,11 @@
                     </div>
                 </div>
 
-                <div class="p-3 bg-red-950/40 border border-red-900/50 rounded-lg text-[11px] text-red-300">
-                    <i class="fa-solid fa-circle-info mr-1"></i> Gunakan Username Dan Password, jika kesulitan bisa report ke DISCORD
+                <div class="p-3 bg-red-950/40 border border-red-900/50 rounded-lg text-[11px] text-red-300 space-y-1">
+                    <p class="font-bold flex items-center gap-1 text-amber-400"><i class="fa-solid fa-shield-cat"></i> Informasi Akses Role:</p>
+                    <p>• <b>High Rank</b> (Full Control) </i></p>
+                    <p>• <b>Member</b> (Read Only)</i></p>
+                    <p class="text-[10px] text-slate-400 mt-1"><i class="fa-solid fa-key mr-1"></i> Gunakan username dan password yang sudah terdaftar </b></p>
                 </div>
 
                 <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg uppercase tracking-wider text-sm transition">
@@ -255,10 +258,6 @@
                         <i class="fa-solid fa-plus w-5 text-center"></i> Tambah Barang
                     </button>
 
-                    <button onclick="openWebhookModal(); closeSidebar();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition text-indigo-400 hover:bg-indigo-950/40 border border-indigo-900/50 uppercase">
-                        <i class="fa-brands fa-discord w-5 text-center"></i> Set Webhook Discord
-                    </button>
-
                     <button onclick="sendFullReportWebhook(); closeSidebar();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition text-amber-400 hover:bg-amber-950/40 border border-amber-900/50 uppercase">
                         <i class="fa-solid fa-paper-plane w-5 text-center"></i> Kirim Laporan Total
                     </button>
@@ -299,9 +298,6 @@
                     </button>
                     <button onclick="openAddItemModal()" id="headerAddBtn" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 uppercase tracking-wider shadow transition">
                         <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Tambah</span>
-                    </button>
-                    <button onclick="openWebhookModal()" class="p-2 bg-slate-800 hover:bg-slate-700 text-indigo-400 rounded-lg text-xs border border-slate-700" title="Webhook Discord">
-                        <i class="fa-brands fa-discord text-base"></i>
                     </button>
                 </div>
             </div>
@@ -365,8 +361,11 @@
             <!-- KEUANGAN / CASHFLOW CONTENT SECTION (Hidden by Default) -->
             <div id="keuanganContainer" class="hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-biker-card p-5 rounded-xl border border-biker-border md:col-span-1">
-                        <h3 class="font-bikerTitle text-xl text-amber-500 mb-4 uppercase">Catat Transaksi Kas</h3>
+                    <!-- CASHFLOW FORM (HIGH RANK ONLY) -->
+                    <div id="cashFormContainer" class="bg-biker-card p-5 rounded-xl border border-biker-border md:col-span-1">
+                        <h3 class="font-bikerTitle text-xl text-amber-500 mb-4 uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-cash-register"></i> Catat Transaksi Kas
+                        </h3>
                         <form onsubmit="addCashflow(event)" class="space-y-3">
                             <div>
                                 <label class="text-xs text-slate-400 uppercase">Kategori Kas / Uang</label>
@@ -430,10 +429,22 @@
                         </form>
                     </div>
 
-                    <div class="bg-biker-card p-5 rounded-xl border border-biker-border md:col-span-2">
+                    <!-- MEMBER READ ONLY NOTICE FOR CASHFLOW -->
+                    <div id="cashReadOnlyNotice" class="hidden bg-biker-card p-5 rounded-xl border border-biker-border md:col-span-1 text-center flex flex-col items-center justify-center">
+                        <div class="w-16 h-16 bg-slate-800/80 border border-slate-700 text-amber-500 rounded-full flex items-center justify-center mb-3 text-2xl">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <h3 class="font-bikerTitle text-xl text-amber-500 uppercase mb-1">AKSES READ ONLY</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed mb-2">
+                            Akun Anda terdaftar sebagai <b>Member</b>. Anda hanya dapat melihat riwayat kas dan laporan keuangan.
+                        </p>
+                        <span class="text-[10px] px-2.5 py-1 bg-slate-900 rounded border border-slate-800 text-slate-400 font-mono">Pencatatan kas hanya diperbolehkan untuk High Rank Officer</span>
+                    </div>
+
+                    <div id="cashLogsContainer" class="bg-biker-card p-5 rounded-xl border border-biker-border md:col-span-2">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="font-bikerTitle text-xl text-white uppercase">Riwayat Kas Keluar Masuk</h3>
-                            <button onclick="clearCashLogs()" class="text-xs text-red-400 hover:underline"><i class="fa-solid fa-trash mr-1"></i> Reset Log</button>
+                            <button id="clearCashBtn" onclick="clearCashLogs()" class="text-xs text-red-400 hover:underline"><i class="fa-solid fa-trash mr-1"></i> Reset Log</button>
                         </div>
                         <div id="cashflowLogs" class="space-y-2 max-h-[420px] overflow-y-auto pr-1">
                             <!-- Logs injected by JS -->
@@ -579,39 +590,6 @@
         </div>
     </div>
 
-    <!-- MODAL: Webhook Discord Settings -->
-    <div id="webhookModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="max-w-md w-full bg-biker-card border border-biker-border rounded-xl p-6 shadow-2xl relative animate-popup">
-            <button onclick="closeWebhookModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            
-            <h3 class="font-bikerTitle text-2xl text-indigo-400 uppercase mb-2 flex items-center gap-2">
-                <i class="fa-brands fa-discord"></i> DISCORD WEBHOOK
-            </h3>
-            <p class="text-xs text-slate-400 mb-4">Pengaturan integrasi laporan otomatis ke channel Discord Club.</p>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="text-xs text-slate-400 uppercase">URL Webhook Channel Discord</label>
-                    <input type="text" id="webhookInput" placeholder="https://discord.com/api/webhooks/..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white font-mono mt-1">
-                </div>
-
-                <div class="flex items-center justify-between p-3 bg-slate-900/60 rounded-lg border border-slate-800">
-                    <span class="text-xs text-slate-300">Auto Send Log per Aksi</span>
-                    <input type="checkbox" id="autoWebhookToggle" checked class="w-4 h-4 accent-red-600 rounded cursor-pointer">
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="testWebhook()" type="button" class="bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-700 text-indigo-300 font-bold py-2.5 rounded-lg text-xs uppercase tracking-wider transition">
-                        <i class="fa-solid fa-paper-plane mr-1"></i> Tes Ping
-                    </button>
-                    <button onclick="saveWebhookSettings()" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg text-xs uppercase tracking-wider transition">
-                        <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan URL
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Default items list
         const defaultItems = [
@@ -625,7 +603,7 @@
             { id: '8', name: 'BOTOL', category: 'mentah', qty: 142, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19570_b.jpg' },
             { id: '10', name: 'KEVLAR', category: 'jadi', qty: 93, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19515_b.jpg' },
             { id: '11', name: 'ANGGUR MERAH', category: 'jadi', qty: 8, unit: 'Botol', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/1669_b.jpg' },
-            { id: '12', name: 'BEER', category: 'jadi', qty: 4, unit: 'Botol', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19824_b.jpg' },
+            { id: '12', name: 'BEER', category: 'persenjataan', qty: 4, unit: 'Botol', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19824_b.jpg' },
             { id: '13', name: 'DESERT EAGLE ', category: 'persenjataan', qty: 306, unit: 'Pcs', image: 'https://dev.prineside.com/en/gtasa_samp_model_id/model/348-desert_eagle/' },
             { id: '14', name: 'AK47', category: 'persenjataan', qty: 200, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/355_b.jpg' },
             { id: '15', name: 'SHOTGUN', category: 'persenjataan', qty: 390, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/349_b.jpg' },
@@ -634,14 +612,18 @@
             { id: '18', name: 'Emas Batangan Safe Reserve', category: 'brankas', qty: 500, unit: 'Gram', image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&auto=format&fit=crop&q=60' }
         ];
 
+        // High Rank Users list (Full Control)
+        const highRankUsers = ['presiden', 'president', 'vicepresident', 'roadcaptain', 'enforcer', 'secretary', 'treasurer', 'maslannn'];
+
         // App State
         let activeTab = 'mentah';
         let stockActionType = 'IN'; // 'IN' or 'OUT'
         let currentUser = localStorage.getItem('biker_user') || null;
+        let currentUserRole = localStorage.getItem('biker_user_role') || 'MEMBER'; // 'HIGH_RANK' or 'MEMBER'
         let webhookUrl = localStorage.getItem('biker_webhook') || 'https://discord.com/api/webhooks/1536094807557152869/YIGzQRhwc-xD-Y-UTEej1LR6PiXOjICRUmXYMbfn6UXB2aLHh9qze0rsq693eOl1lVTJ';
         
         let registeredUsers = JSON.parse(localStorage.getItem('biker_registered_users')) || [
-            'presiden', 'president', 'vicepresident', 'roadcaptain', 'enforcer', 'secretary', 'treasurer', 'prospect', 'member','maslannn'
+            'presiden', 'president', 'vicepresident', 'roadcaptain', 'enforcer', 'secretary', 'treasurer', 'prospect', 'member', 'maslannn'
         ];
         
         let items = JSON.parse(localStorage.getItem('biker_items')) || defaultItems;
@@ -651,29 +633,180 @@
         let redCash = parseInt(localStorage.getItem('biker_red_cash')) || 200000;
         let pendingWebhookLogs = JSON.parse(localStorage.getItem('biker_pending_webhooks')) || [];
 
-        // LOADING OVERLAY CONTROLLER
-        function showLoader(title = "MEMPROSES DATA...", subtext = "Mohon tunggu sebentar...", minDurationMs = 500, callback = null) {
+        function closeSplash() {
+            const splash = document.getElementById('splashScreen');
+            if (splash) {
+                splash.classList.add('opacity-0');
+                setTimeout(() => {
+                    splash.classList.add('hidden');
+                    checkAuth();
+                }, 400);
+            }
+        }
+
+        function showErrorModal(msg) {
+            const modal = document.getElementById('errorModal');
+            const msgEl = document.getElementById('errorMessage');
+            if (msgEl) msgEl.textContent = msg;
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeErrorModal() {
+            const modal = document.getElementById('errorModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function openSidebar() {
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const drawer = document.getElementById('sidebarDrawer');
+            if (backdrop) {
+                backdrop.classList.remove('opacity-0', 'pointer-events-none');
+                backdrop.classList.add('opacity-100', 'pointer-events-auto');
+            }
+            if (drawer) drawer.classList.remove('-translate-x-full');
+        }
+
+        function closeSidebar() {
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const drawer = document.getElementById('sidebarDrawer');
+            if (backdrop) {
+                backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+                backdrop.classList.add('opacity-0', 'pointer-events-none');
+            }
+            if (drawer) drawer.classList.add('-translate-x-full');
+        }
+
+        function closeItemModal() {
+            const modal = document.getElementById('itemModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function closeStockModal() {
+            const modal = document.getElementById('stockModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function setStockActionType(type) {
+            stockActionType = type;
+            const inBtn = document.getElementById('stockActionInBtn');
+            const outBtn = document.getElementById('stockActionOutBtn');
+            
+            if (type === 'IN') {
+                if (inBtn) inBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition bg-emerald-600 text-white";
+                if (outBtn) outBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition text-slate-400 hover:text-white";
+            } else {
+                if (inBtn) inBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition text-slate-400 hover:text-white";
+                if (outBtn) outBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition bg-red-600 text-white";
+            }
+        }
+
+        function switchTab(tab) {
+            const titles = {
+                mentah: 'BARANG MENTAH',
+                jadi: 'BARANG JADI',
+                persenjataan: 'PERSENJATAAN',
+                brankas: 'BRANKAS ASSET',
+                keuangan: 'KEUANGAN & KAS'
+            };
+
+            const targetTitle = titles[tab] || 'INVENTARIS';
+
+            // Menampilkan loader visual saat berpindah menu
+            showLoader('MEMUAT MENU...', `Mengakses database ${targetTitle}...`, 350, () => {
+                activeTab = tab;
+                const titleEl = document.getElementById('activeSectionTitle');
+                if (titleEl) titleEl.textContent = targetTitle;
+
+                const tabs = ['mentah', 'jadi', 'persenjataan', 'brankas', 'keuangan'];
+                tabs.forEach(t => {
+                    const navBtn = document.getElementById(`nav-${t}`);
+                    if (navBtn) {
+                        if (t === tab) {
+                            navBtn.className = "nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-white bg-red-600";
+                        } else {
+                            navBtn.className = "nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-slate-400 hover:bg-slate-800/60 hover:text-white";
+                        }
+                    }
+                });
+
+                closeSidebar();
+                renderAll();
+            });
+        }
+
+        function handleLogoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const dataUrl = evt.target.result;
+                localStorage.setItem('biker_logo', dataUrl);
+                updateLogoImages(dataUrl);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateLogoImages(url) {
+            ['splashLogo', 'sidebarLogo', 'appBarLogo'].forEach(id => {
+                const img = document.getElementById(id);
+                if (img) img.src = url;
+            });
+        }
+
+        function handleImageFileSelect(e, inputId, previewImgId, labelId) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const labelEl = document.getElementById(labelId);
+            if (labelEl) labelEl.textContent = file.name;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const dataUrl = evt.target.result;
+                const inputEl = document.getElementById(inputId);
+                const previewImg = document.getElementById(previewImgId);
+                const container = document.getElementById(previewImgId + 'Container');
+
+                if (inputEl) inputEl.value = dataUrl;
+                if (previewImg) previewImg.src = dataUrl;
+                if (container) container.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearImageSelect(inputId, previewContainerId, fileInputId, labelId) {
+            const inputEl = document.getElementById(inputId);
+            const fileInputEl = document.getElementById(fileInputId);
+            const container = document.getElementById(previewContainerId);
+            const labelEl = document.getElementById(labelId);
+
+            if (inputEl) inputEl.value = '';
+            if (fileInputEl) fileInputEl.value = '';
+            if (container) container.classList.add('hidden');
+            if (labelEl) labelEl.textContent = 'Pilih Foto dari Perangkat...';
+        }
+
+        function showLoader(title, subtext, duration = 500, callback = null) {
             const overlay = document.getElementById('actionLoadingOverlay');
-            const titleElem = document.getElementById('actionLoadingTitle');
-            const subtextElem = document.getElementById('actionLoadingSubtext');
+            const titleEl = document.getElementById('actionLoadingTitle');
+            const subtextEl = document.getElementById('actionLoadingSubtext');
             const progressBar = document.getElementById('actionProgressBar');
 
-            if (titleElem) titleElem.textContent = title;
-            if (subtextElem) subtextElem.textContent = subtext;
+            if (titleEl) titleEl.textContent = title;
+            if (subtextEl) subtextEl.textContent = subtext;
             if (progressBar) progressBar.style.width = '0%';
-
             if (overlay) overlay.classList.remove('hidden');
 
-            setTimeout(() => { if (progressBar) progressBar.style.width = '70%'; }, 50);
+            setTimeout(() => {
+                if (progressBar) progressBar.style.width = '100%';
+            }, 50);
 
-            if (minDurationMs > 0) {
+            if (duration > 0) {
                 setTimeout(() => {
-                    if (progressBar) progressBar.style.width = '100%';
-                    setTimeout(() => {
-                        hideLoader();
-                        if (typeof callback === 'function') callback();
-                    }, 180);
-                }, minDurationMs);
+                    hideLoader();
+                    if (typeof callback === 'function') callback();
+                }, duration);
             } else if (typeof callback === 'function') {
                 callback();
             }
@@ -684,33 +817,130 @@
             if (overlay) overlay.classList.add('hidden');
         }
 
-        // SIDEBAR DRAWER CONTROLS
-        function openSidebar() {
-            const drawer = document.getElementById('sidebarDrawer');
-            const backdrop = document.getElementById('sidebarBackdrop');
-            if (drawer) drawer.classList.remove('-translate-x-full');
-            if (backdrop) {
-                backdrop.classList.remove('opacity-0', 'pointer-events-none');
-                backdrop.classList.add('opacity-100');
+        function addLog(action, detail, proof = '') {
+            const logItem = {
+                action,
+                detail,
+                proof,
+                user: currentUser || 'System',
+                timestamp: new Date().toLocaleString('id-ID')
+            };
+            logs.unshift(logItem);
+            localStorage.setItem('biker_logs', JSON.stringify(logs));
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('activityLogs');
+            if (!container) return;
+
+            if (logs.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 italic">Belum ada riwayat aktivitas.</p>`;
+                return;
+            }
+
+            container.innerHTML = logs.map(l => `
+                <div class="p-2 bg-slate-900/80 rounded border border-slate-800 flex items-start justify-between gap-2">
+                    <div>
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span class="font-bold text-red-500 uppercase">[${l.action}]</span>
+                            <span class="text-[10px] text-amber-500 font-semibold">${l.user || 'System'}</span>
+                        </div>
+                        <p class="text-slate-300 text-xs">${l.detail}</p>
+                        ${l.proof ? `<a href="${l.proof}" target="_blank" class="text-[10px] text-indigo-400 hover:underline flex items-center gap-1 mt-1"><i class="fa-solid fa-image"></i> Lihat Bukti Foto</a>` : ''}
+                    </div>
+                    <span class="text-[10px] text-slate-500 font-mono whitespace-nowrap">${l.timestamp}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderCashLogs() {
+            const container = document.getElementById('cashflowLogs');
+            if (!container) return;
+
+            if (cashlogs.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 italic text-xs p-3 text-center">Belum ada riwayat transaksi kas.</p>`;
+                return;
+            }
+
+            container.innerHTML = cashlogs.map(c => {
+                const isIn = c.type === 'IN';
+                const badgeColor = isIn ? 'text-emerald-400 bg-emerald-950/60 border-emerald-800' : 'text-red-400 bg-red-950/60 border-red-800';
+                return `
+                    <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-800 flex items-center justify-between gap-3">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 text-[10px] font-bold rounded border ${badgeColor}">
+                                    ${isIn ? '+ MASUK' : '- KELUAR'} (${c.currency})
+                                </span>
+                                <span class="text-xs text-white font-semibold">${c.category}</span>
+                            </div>
+                            <p class="text-xs text-slate-400">${c.notes || 'Tanpa Catatan'}</p>
+                            <div class="flex items-center gap-3 mt-1 text-[10px] text-slate-500">
+                                <span><i class="fa-solid fa-user mr-1"></i>${c.user || 'System'}</span>
+                                <span><i class="fa-solid fa-clock mr-1"></i>${c.timestamp}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-mono font-bold text-sm ${isIn ? 'text-emerald-400' : 'text-red-400'}">
+                                ${isIn ? '+' : '-'} Rp ${parseInt(c.amount).toLocaleString('id-ID')}
+                            </div>
+                            ${c.proof ? `<a href="${c.proof}" target="_blank" class="text-[10px] text-amber-400 hover:underline flex items-center justify-end gap-1 mt-1"><i class="fa-solid fa-receipt"></i> Struk</a>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderStats() {
+            const statVault = document.getElementById('statVault');
+            const statRedVault = document.getElementById('statRedVault');
+            const statWeapons = document.getElementById('statWeapons');
+            const statRaw = document.getElementById('statRaw');
+            const statFinished = document.getElementById('statFinished');
+
+            if (statVault) statVault.textContent = `Rp ${vaultCash.toLocaleString('id-ID')}`;
+            if (statRedVault) statRedVault.textContent = `Rp ${redCash.toLocaleString('id-ID')}`;
+
+            const totalWeapons = items.filter(i => i.category === 'persenjataan').reduce((acc, curr) => acc + (parseInt(curr.qty) || 0), 0);
+            const totalRaw = items.filter(i => i.category === 'mentah').reduce((acc, curr) => acc + (parseInt(curr.qty) || 0), 0);
+            const totalFinished = items.filter(i => i.category === 'jadi').reduce((acc, curr) => acc + (parseInt(curr.qty) || 0), 0);
+
+            if (statWeapons) statWeapons.textContent = `${totalWeapons} Item`;
+            if (statRaw) statRaw.textContent = `${totalRaw} Stok`;
+            if (statFinished) statFinished.textContent = `${totalFinished} Stok`;
+        }
+
+        function updatePendingWebhookUI() {
+            const badge = document.getElementById('pendingCountBadge');
+            const btn = document.getElementById('sendPendingWebhookBtn');
+            if (badge) badge.textContent = pendingWebhookLogs.length;
+            if (btn) {
+                if (pendingWebhookLogs.length > 0) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
             }
         }
 
-        function closeSidebar() {
-            const drawer = document.getElementById('sidebarDrawer');
-            const backdrop = document.getElementById('sidebarBackdrop');
-            if (drawer) drawer.classList.add('-translate-x-full');
-            if (backdrop) {
-                backdrop.classList.remove('opacity-100');
-                backdrop.classList.add('opacity-0', 'pointer-events-none');
-            }
+        function saveItems() {
+            localStorage.setItem('biker_items', JSON.stringify(items));
+            renderAll();
         }
 
-        // SPLASH SCREEN & AUTH
-        function closeSplash() {
-            sessionStorage.setItem('splash_seen', 'true');
-            const splashScreen = document.getElementById('splashScreen');
-            if (splashScreen) splashScreen.classList.add('hidden');
-            checkAuth();
+        function renderAll() {
+            renderStats();
+            renderInventory();
+            renderCashLogs();
+            renderLogs();
+            updatePendingWebhookUI();
+        }
+
+        // Initialize saved custom logo if existing
+        const savedLogo = localStorage.getItem('biker_logo');
+        if (savedLogo) {
+            updateLogoImages(savedLogo);
         }
 
         function checkAuth() {
@@ -721,13 +951,60 @@
                 if (loginScreen) loginScreen.classList.add('hidden');
                 if (mainContent) mainContent.classList.remove('hidden');
                 
+                const isHighRank = currentUserRole === 'HIGH_RANK';
                 const userBadge = document.getElementById('userBadgeSidebar');
-                if (userBadge) userBadge.textContent = currentUser.toUpperCase();
-                
+                if (userBadge) {
+                    userBadge.textContent = `${currentUser.toUpperCase()} • ${isHighRank ? 'HIGH RANK' : 'MEMBER (READ ONLY)'}`;
+                    userBadge.className = isHighRank ? "text-[10px] text-red-500 font-bold block" : "text-[10px] text-amber-500 font-mono block";
+                }
+
+                // Apply UI permissions based on Role
+                applyRolePermissions();
                 renderAll();
             } else {
                 if (mainContent) mainContent.classList.add('hidden');
                 if (loginScreen) loginScreen.classList.remove('hidden');
+            }
+        }
+
+        function applyRolePermissions() {
+            const isHighRank = currentUserRole === 'HIGH_RANK';
+
+            // Nav Add Item Btn
+            const navAddItemBtn = document.getElementById('navAddItemBtn');
+            if (navAddItemBtn) {
+                if (isHighRank) {
+                    navAddItemBtn.classList.remove('hidden');
+                } else {
+                    navAddItemBtn.classList.add('hidden');
+                }
+            }
+
+            // Header Add Btn
+            const headerAddBtn = document.getElementById('headerAddBtn');
+            if (headerAddBtn) {
+                if (isHighRank) {
+                    headerAddBtn.classList.remove('hidden');
+                } else {
+                    headerAddBtn.classList.add('hidden');
+                }
+            }
+
+            // Cashflow Form vs ReadOnly Notice
+            const cashFormContainer = document.getElementById('cashFormContainer');
+            const cashReadOnlyNotice = document.getElementById('cashReadOnlyNotice');
+            const clearCashBtn = document.getElementById('clearCashBtn');
+
+            if (cashFormContainer && cashReadOnlyNotice) {
+                if (isHighRank) {
+                    cashFormContainer.classList.remove('hidden');
+                    cashReadOnlyNotice.classList.add('hidden');
+                    if (clearCashBtn) clearCashBtn.classList.remove('hidden');
+                } else {
+                    cashFormContainer.classList.add('hidden');
+                    cashReadOnlyNotice.classList.remove('hidden');
+                    if (clearCashBtn) clearCashBtn.classList.add('hidden');
+                }
             }
         }
 
@@ -737,20 +1014,30 @@
             const pass = document.getElementById('loginPass').value.trim();
 
             showLoader("MENGOTENTIKASI...", "Memeriksa Kredensial Club...", 600, () => {
-                const isUserRegistered = registeredUsers.some(u => u.toLowerCase() === user.toLowerCase());
+                const userLower = user.toLowerCase();
+                const isUserRegistered = registeredUsers.some(u => u.toLowerCase() === userLower);
                 
                 if (!isUserRegistered) {
-                    showErrorModal(`Username "${user}" tidak terdaftar dalam database klub! Silakan gunakan Callsign / Username resmi yang terdafta.`);
+                    showErrorModal(`Username "${user}" tidak terdaftar dalam database klub! Silakan gunakan Callsign / Username resmi yang terdaftar.`);
                     return;
                 }
 
                 if (pass === '123456') {
                     currentUser = user;
+                    // Determine Role
+                    if (highRankUsers.includes(userLower)) {
+                        currentUserRole = 'HIGH_RANK';
+                    } else {
+                        currentUserRole = 'MEMBER';
+                    }
+
                     localStorage.setItem('biker_user', currentUser);
+                    localStorage.setItem('biker_user_role', currentUserRole);
+
                     checkAuth();
-                    addLog('LOGIN SYSTEM', `Member ${user} berhasil masuk ke repository.`);
+                    addLog('LOGIN SYSTEM', `[${currentUserRole}] Member ${user} berhasil masuk ke repository.`);
                 } else {
-                    showErrorModal('Password yang Anda masukkan salah!Gunakakn passeord yang sudah tedaftar');
+                    showErrorModal('Password yang Anda masukkan salah! Gunakan password yang sudah terdaftar.');
                 }
             });
         }
@@ -758,195 +1045,12 @@
         function logout() {
             showLoader("LOGOUT...", "Keluar dari sistem...", 400, () => {
                 currentUser = null;
+                currentUserRole = 'MEMBER';
                 localStorage.removeItem('biker_user');
+                localStorage.removeItem('biker_user_role');
                 closeSidebar();
                 checkAuth();
             });
-        }
-
-        function showErrorModal(msg) {
-            const errorModal = document.getElementById('errorModal');
-            const errorMessage = document.getElementById('errorMessage');
-            if (errorMessage) errorMessage.textContent = msg;
-            if (errorModal) errorModal.classList.remove('hidden');
-        }
-
-        function closeErrorModal() {
-            const errorModal = document.getElementById('errorModal');
-            if (errorModal) errorModal.classList.add('hidden');
-            const loginPass = document.getElementById('loginPass');
-            if (loginPass) {
-                loginPass.value = '';
-                loginPass.focus();
-            }
-        }
-
-        // FILE UPLOAD HANDLERS
-        function handleImageFileSelect(event, textInputId, previewImgId, labelId) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            if (file.size > 3 * 1024 * 1024) {
-                showErrorModal('Ukuran file terlalu besar! Gunakan gambar dengan ukuran di bawah 3MB.');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const dataUrl = e.target.result;
-                const textInput = document.getElementById(textInputId);
-                const previewImg = document.getElementById(previewImgId);
-                const labelElem = document.getElementById(labelId);
-                
-                if (textInput) textInput.value = dataUrl;
-                if (previewImg) {
-                    previewImg.src = dataUrl;
-                    const container = previewImg.closest('div[id$="Container"]');
-                    if (container) container.classList.remove('hidden');
-                }
-                if (labelElem) labelElem.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function clearImageSelect(textInputId, containerId, fileInputId, labelId) {
-            const textInput = document.getElementById(textInputId);
-            const container = document.getElementById(containerId);
-            const fileInput = document.getElementById(fileInputId);
-            const labelElem = document.getElementById(labelId);
-
-            if (textInput) textInput.value = '';
-            if (container) container.classList.add('hidden');
-            if (fileInput) fileInput.value = '';
-            if (labelElem) labelElem.textContent = 'Pilih File Gambar...';
-        }
-
-        function handleLogoUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const dataUrl = e.target.result;
-                const splashLogo = document.getElementById('splashLogo');
-                const appBarLogo = document.getElementById('appBarLogo');
-                const sidebarLogo = document.getElementById('sidebarLogo');
-                if (splashLogo) splashLogo.src = dataUrl;
-                if (appBarLogo) appBarLogo.src = dataUrl;
-                if (sidebarLogo) sidebarLogo.src = dataUrl;
-                localStorage.setItem('biker_custom_logo', dataUrl);
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Initialize App
-        window.onload = function() {
-            // Restore custom logo if saved
-            const savedLogo = localStorage.getItem('biker_custom_logo');
-            if (savedLogo) {
-                const splashLogo = document.getElementById('splashLogo');
-                const appBarLogo = document.getElementById('appBarLogo');
-                const sidebarLogo = document.getElementById('sidebarLogo');
-                if (splashLogo) splashLogo.src = savedLogo;
-                if (appBarLogo) appBarLogo.src = savedLogo;
-                if (sidebarLogo) sidebarLogo.src = savedLogo;
-            }
-
-            // Check Splash visibility
-            const splashSeen = sessionStorage.getItem('splash_seen');
-            if (splashSeen) {
-                const splashScreen = document.getElementById('splashScreen');
-                if (splashScreen) splashScreen.classList.add('hidden');
-                checkAuth();
-            } else {
-                const mainContent = document.getElementById('mainContent');
-                const loginScreen = document.getElementById('loginScreen');
-                if (mainContent) mainContent.classList.add('hidden');
-                if (loginScreen) loginScreen.classList.add('hidden');
-            }
-
-            const whInput = document.getElementById('webhookInput');
-            if (whInput) whInput.value = webhookUrl;
-
-            renderAll();
-        };
-
-        // NAVIGATION SWITCH TAB
-        function switchTab(tab) {
-            showLoader("MEMUAT...", `Membuka modul ${tab.toUpperCase()}...`, 250, () => {
-                activeTab = tab;
-                
-                // Active Nav Styling
-                const tabs = ['mentah', 'jadi', 'persenjataan', 'brankas', 'keuangan'];
-                tabs.forEach(t => {
-                    const btn = document.getElementById(`nav-${t}`);
-                    if (btn) {
-                        if (t === tab) {
-                            btn.className = "nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-white bg-red-600 shadow-md";
-                        } else {
-                            btn.className = "nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-slate-400 hover:bg-slate-800/60 hover:text-white";
-                        }
-                    }
-                });
-
-                const activeTitle = document.getElementById('activeSectionTitle');
-                if (activeTitle) {
-                    const titles = {
-                        'mentah': 'BARANG MENTAH',
-                        'jadi': 'BARANG JADI',
-                        'persenjataan': 'PERSENJATAAN / ARMORY',
-                        'brankas': 'BRANKAS ASSET',
-                        'keuangan': 'KEUANGAN & KAS'
-                    };
-                    activeTitle.textContent = titles[tab] || tab.toUpperCase();
-                }
-
-                closeSidebar();
-                renderAll();
-            });
-        }
-
-        // PENDING WEBHOOK UI UPDATER
-        function updatePendingWebhookUI() {
-            const btn = document.getElementById('sendPendingWebhookBtn');
-            const badge = document.getElementById('pendingCountBadge');
-            const count = pendingWebhookLogs ? pendingWebhookLogs.length : 0;
-
-            if (badge) badge.textContent = count;
-            if (btn) {
-                if (count > 0) {
-                    btn.classList.remove('hidden');
-                } else {
-                    btn.classList.add('hidden');
-                }
-            }
-        }
-
-        // RENDER ALL DATA UI
-        function renderAll() {
-            renderStats();
-            renderInventory();
-            renderCashflow();
-            renderLogs();
-            updatePendingWebhookUI();
-        }
-
-        function renderStats() {
-            const rawCount = items.filter(i => i.category === 'mentah').reduce((a, b) => a + Number(b.qty), 0);
-            const finishedCount = items.filter(i => i.category === 'jadi').reduce((a, b) => a + Number(b.qty), 0);
-            const weaponCount = items.filter(i => i.category === 'persenjataan').reduce((a, b) => a + Number(b.qty), 0);
-
-            const statVault = document.getElementById('statVault');
-            const statRedVault = document.getElementById('statRedVault');
-            const statWeapons = document.getElementById('statWeapons');
-            const statRaw = document.getElementById('statRaw');
-            const statFinished = document.getElementById('statFinished');
-
-            if (statVault) statVault.textContent = `Rp ${vaultCash.toLocaleString('id-ID')}`;
-            if (statRedVault) statRedVault.textContent = `Rp ${redCash.toLocaleString('id-ID')}`;
-            if (statWeapons) statWeapons.textContent = `${weaponCount} Item`;
-            if (statRaw) statRaw.textContent = `${rawCount} Stok`;
-            if (statFinished) statFinished.textContent = `${finishedCount} Stok`;
         }
 
         function renderInventory() {
@@ -966,14 +1070,18 @@
             const filteredItems = items.filter(i => i.category === activeTab);
             container.innerHTML = '';
 
+            const isHighRank = currentUserRole === 'HIGH_RANK';
+
             if (filteredItems.length === 0) {
                 container.innerHTML = `
                     <div class="col-span-full text-center py-12 bg-biker-card border border-biker-border rounded-xl p-6">
                         <i class="fa-solid fa-box-open text-4xl text-slate-600 mb-2"></i>
                         <p class="text-sm text-slate-400">Belum ada data barang untuk kategori ini.</p>
-                        <button onclick="openAddItemModal()" class="mt-3 bg-red-600 text-white text-xs px-4 py-2 rounded-lg uppercase tracking-wider font-bold">
-                            + Tambah Barang Pertama
-                        </button>
+                        ${isHighRank ? `
+                            <button onclick="openAddItemModal()" class="mt-3 bg-red-600 text-white text-xs px-4 py-2 rounded-lg uppercase tracking-wider font-bold">
+                                + Tambah Barang Pertama
+                            </button>
+                        ` : ''}
                     </div>
                 `;
                 return;
@@ -982,24 +1090,8 @@
             filteredItems.forEach(item => {
                 const card = document.createElement('div');
                 card.className = "bg-biker-card border border-biker-border rounded-xl p-4 flex flex-col justify-between hover:border-red-900/60 transition shadow-lg relative group";
-                card.innerHTML = `
-                    <div>
-                        <div class="relative w-full h-36 bg-slate-900 rounded-lg overflow-hidden mb-3 border border-slate-800">
-                            <img src="${item.image || 'https://placehold.co/400x300/1e293b/ffffff?text=NO+IMAGE'}" 
-                                 alt="${item.name}" 
-                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                                 onerror="this.src='https://placehold.co/400x300/1e293b/ffffff?text=NO+IMAGE'">
-                            <span class="absolute top-2 right-2 bg-black/75 backdrop-blur text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded border border-slate-700 uppercase">
-                                ${item.unit}
-                            </span>
-                        </div>
-                        <h4 class="font-bikerTitle text-lg text-white tracking-wider leading-tight uppercase mb-1">${item.name}</h4>
-                        <div class="flex items-baseline gap-2 mb-3">
-                            <span class="text-2xl font-bold font-mono text-red-500">${item.qty}</span>
-                            <span class="text-xs text-slate-400 font-mono">${item.unit} Tersedia</span>
-                        </div>
-                    </div>
-
+                
+                const actionControlsHTML = isHighRank ? `
                     <div class="space-y-2 pt-2 border-t border-slate-800">
                         <div class="grid grid-cols-2 gap-1.5">
                             <button onclick="quickStockAdjust('${item.id}', 1)" class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 py-1.5 rounded text-xs font-bold transition flex items-center justify-center gap-1">
@@ -1022,109 +1114,41 @@
                             </button>
                         </div>
                     </div>
+                ` : `
+                    <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                        <span>Status: Read Only</span>
+                        <span class="bg-slate-900 px-2 py-0.5 rounded text-amber-500 border border-slate-800">Member Mode</span>
+                    </div>
+                `;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="relative w-full h-36 bg-slate-900 rounded-lg overflow-hidden mb-3 border border-slate-800">
+                            <img src="${item.image || 'https://placehold.co/400x300/1e293b/ffffff?text=NO+IMAGE'}" 
+                                 alt="${item.name}" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                                 onerror="this.src='https://placehold.co/400x300/1e293b/ffffff?text=NO+IMAGE'">
+                            <span class="absolute top-2 right-2 bg-black/75 backdrop-blur text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded border border-slate-700 uppercase">
+                                ${item.unit}
+                            </span>
+                        </div>
+                        <h4 class="font-bikerTitle text-lg text-white tracking-wider leading-tight uppercase mb-1">${item.name}</h4>
+                        <div class="flex items-baseline gap-2 mb-3">
+                            <span class="text-2xl font-bold font-mono text-red-500">${item.qty}</span>
+                            <span class="text-xs text-slate-400 font-mono">${item.unit} Tersedia</span>
+                        </div>
+                    </div>
+                    ${actionControlsHTML}
                 `;
                 container.appendChild(card);
             });
         }
 
-        function renderCashflow() {
-            const container = document.getElementById('cashflowLogs');
-            if (!container) return;
-
-            container.innerHTML = '';
-            if (cashlogs.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Belum ada catatan transaksi keuangan.</p>`;
-                return;
-            }
-
-            cashlogs.forEach(log => {
-                const item = document.createElement('div');
-                const isClean = log.currency === 'CLEAN';
-                const isIncome = log.type === 'IN';
-
-                item.className = `p-3 rounded-lg border text-xs flex flex-col md:flex-row md:items-center justify-between gap-2 ${
-                    isClean 
-                        ? 'bg-slate-900/80 border-slate-800' 
-                        : 'bg-red-950/30 border-red-900/40'
-                }`;
-
-                item.innerHTML = `
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                            isIncome ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-red-950 text-red-400 border border-red-800'
-                        }">
-                            <i class="fa-solid ${isIncome ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-white uppercase">${log.category}</span>
-                                <span class="text-[9px] px-1.5 py-0.5 rounded font-mono ${
-                                    isClean ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-red-900 text-red-200 border border-red-700'
-                                }">
-                                    ${isClean ? '💵 CLEAN' : '🔴 RED MONEY'}
-                                </span>
-                            </div>
-                            <p class="text-slate-400 text-[11px] mt-0.5">${log.notes || 'Tanpa Catatan'}</p>
-                            <span class="text-[10px] text-slate-500 font-mono">${log.timestamp} • PJ: ${log.user}</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between md:justify-end gap-3 border-t md:border-0 border-slate-800/80 pt-2 md:pt-0">
-                        ${log.proof ? `
-                            <a href="${log.proof}" target="_blank" class="text-[11px] text-amber-400 hover:underline flex items-center gap-1 bg-amber-950/40 px-2 py-1 rounded border border-amber-900/50">
-                                <i class="fa-solid fa-image"></i> Bukti Struk
-                            </a>
-                        ` : ''}
-                        <div class="text-right">
-                            <span class="font-bold font-mono text-sm block ${isIncome ? 'text-emerald-400' : 'text-red-400'}">
-                                ${isIncome ? '+' : '-'} Rp ${log.amount.toLocaleString('id-ID')}
-                            </span>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function renderLogs() {
-            const container = document.getElementById('activityLogs');
-            if (!container) return;
-
-            container.innerHTML = '';
-            if (logs.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Belum ada riwayat log aktivitas.</p>`;
-                return;
-            }
-
-            logs.slice(0, 30).forEach(log => {
-                const item = document.createElement('div');
-                item.className = "py-1.5 border-b border-slate-800/60 flex items-start justify-between gap-2 text-[11px]";
-                item.innerHTML = `
-                    <div>
-                        <span class="text-red-500 font-bold uppercase mr-1">[${log.action}]</span>
-                        <span class="text-slate-300">${log.detail}</span>
-                        ${log.proof ? `<a href="${log.proof}" target="_blank" class="ml-2 text-amber-400 hover:underline font-semibold"><i class="fa-solid fa-image"></i> Lihat Bukti</a>` : ''}
-                    </div>
-                    <span class="text-[10px] text-slate-500 font-mono whitespace-nowrap">${log.timestamp}</span>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function saveItems() {
-            localStorage.setItem('biker_items', JSON.stringify(items));
-            renderAll();
-        }
-
-        function addLog(action, detail, proof = null) {
-            const timestamp = new Date().toLocaleString('id-ID');
-            logs.unshift({ action, detail, proof, timestamp, user: currentUser || 'System' });
-            localStorage.setItem('biker_logs', JSON.stringify(logs));
-            renderLogs();
-        }
-
-        // QUICK STOK ADJUST (+1 / -1)
         function quickStockAdjust(id, delta) {
+            if (currentUserRole !== 'HIGH_RANK') {
+                showErrorModal('AKSES DITOLAK! Akun Member hanya memiliki hak akses READ ONLY.');
+                return;
+            }
             const item = items.find(i => i.id === id);
             if (!item) return;
 
@@ -1142,8 +1166,11 @@
             queueWebhookNotification(`📋 **Quick Update Stok**\n**Action:** ${actionLabel}\n**Item:** ${item.name}\n**Jumlah:** ${delta > 0 ? '+' : ''}${delta} ${item.unit}\n**Sisa Stok:** ${item.qty} ${item.unit}\n**User:** ${currentUser || 'System'}`);
         }
 
-        // MODAL ITEM HANDLERS
         function openAddItemModal() {
+            if (currentUserRole !== 'HIGH_RANK') {
+                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat menambah item.');
+                return;
+            }
             const modal = document.getElementById('itemModal');
             const form = document.getElementById('itemForm');
             const title = document.getElementById('modalTitle');
@@ -1156,6 +1183,10 @@
         }
 
         function openEditItemModal(id) {
+            if (currentUserRole !== 'HIGH_RANK') {
+                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat mengubah data item.');
+                return;
+            }
             const item = items.find(i => i.id === id);
             if (!item) return;
 
@@ -1182,13 +1213,12 @@
             if (modal) modal.classList.remove('hidden');
         }
 
-        function closeItemModal() {
-            const modal = document.getElementById('itemModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
         function saveItem(e) {
             e.preventDefault();
+            if (currentUserRole !== 'HIGH_RANK') {
+                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat menyimpan data item.');
+                return;
+            }
             const id = document.getElementById('itemId').value || Date.now().toString();
             const name = document.getElementById('itemName').value.trim();
             const category = document.getElementById('itemCategory').value;
@@ -1213,6 +1243,10 @@
         }
 
         function deleteItem(id) {
+            if (currentUserRole !== 'HIGH_RANK') {
+                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat menghapus item.');
+                return;
+            }
             const item = items.find(i => i.id === id);
             if (!item) return;
 
@@ -1226,8 +1260,11 @@
             }
         }
 
-        // STOCK MODAL CONTROLS
         function openStockModal(id, actionType = 'IN') {
+            if (currentUserRole !== 'HIGH_RANK') {
+                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat mengubah stok.');
+                return;
+            }
             const item = items.find(i => i.id === id);
             if (!item) return;
 
@@ -1243,26 +1280,11 @@
             if (modal) modal.classList.remove('hidden');
         }
 
-        function setStockActionType(type) {
-            stockActionType = type;
-            const inBtn = document.getElementById('stockActionInBtn');
-            const outBtn = document.getElementById('stockActionOutBtn');
-
-            if (type === 'IN') {
-                if (inBtn) inBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition bg-emerald-600 text-white shadow";
-                if (outBtn) outBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition text-slate-400 hover:text-white";
-            } else {
-                if (inBtn) inBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition text-slate-400 hover:text-white";
-                if (outBtn) outBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition bg-red-600 text-white shadow";
-            }
-        }
-
-        function closeStockModal() {
-            const modal = document.getElementById('stockModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
         function confirmStockChange() {
+            if (currentUserRole !== 'HIGH_RANK') {
+                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat mengonfirmasi stok.');
+                return;
+            }
             const id = document.getElementById('stockModalItemId').value;
             const amount = parseInt(document.getElementById('stockModalAmount').value) || 0;
             const notes = document.getElementById('stockModalNotes').value.trim() || 'Tanpa catatan';
@@ -1293,9 +1315,12 @@
             });
         }
 
-        // FINANCIAL / CASHFLOW HANDLER
         function addCashflow(e) {
             e.preventDefault();
+            if (currentUserRole !== 'HIGH_RANK') {
+                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat mencatat transaksi kas.');
+                return;
+            }
             const currency = document.getElementById('cashCurrency').value;
             const type = document.getElementById('cashType').value;
             const category = document.getElementById('cashCategory').value;
@@ -1347,6 +1372,10 @@
         }
 
         function clearCashLogs() {
+            if (currentUserRole !== 'HIGH_RANK') {
+                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat mereset log kas.');
+                return;
+            }
             if (confirm('Bersihkan seluruh catatan riwayat kas?')) {
                 cashlogs = [];
                 localStorage.removeItem('biker_cashlogs');
@@ -1460,11 +1489,6 @@
                 return;
             }
 
-            if (!webhookUrl) {
-                openWebhookModal();
-                return;
-            }
-
             showLoader('MENGIRIM DISCORD...', 'Mengirim rangkuman log ke Discord Webhook...', 0);
 
             let combinedMessage = `📋 **RANGKUMAN LOG PERUBAHAN (${pendingWebhookLogs.length} Aktivitas)**\n\n`;
@@ -1502,11 +1526,6 @@
         }
 
         function sendFullReportWebhook() {
-            if (!webhookUrl) {
-                openWebhookModal();
-                return;
-            }
-
             showLoader('MENGIRIM LAPORAN...', 'Menyiapkan & mengirim Laporan Total ke Discord...', 0);
 
             const rawItems = items.filter(i => i.category === 'mentah');
@@ -1560,66 +1579,6 @@
             executeDiscordSend(payload, null, () => {
                 hideLoader();
                 showLoader('SUKSES', 'Laporan Total berhasil dikirim ke Discord!', 1000);
-            });
-        }
-
-        function testWebhook() {
-            const inputUrl = document.getElementById('webhookInput').value.trim() || webhookUrl;
-            if (!inputUrl) {
-                showErrorModal('Silakan masukkan URL Webhook Discord terlebih dahulu!');
-                return;
-            }
-            showLoader('TES WEBHOOK...', 'Mengirim pesan tes ke Discord...', 0);
-            const payload = {
-                username: "WESGATH MC BOT",
-                avatar_url: "https://i.imgur.com/xdrO148.png",
-                embeds: [{
-                    title: "🔔 TEST NOTIFIKASI WEBHOOK",
-                    description: "Jika Anda melihat pesan ini, integrasi Webhook Discord WESGATH MC berfungsi dengan baik!",
-                    color: 3066993,
-                    footer: {
-                        text: "Diuji oleh: " + (currentUser || 'System') + " • " + new Date().toLocaleString('id-ID')
-                    }
-                }]
-            };
-            fetch(inputUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(res => {
-                hideLoader();
-                if (res.ok || res.status === 204) {
-                    showLoader('BERHASIL', 'Tes Ping Webhook Discord Berhasil!', 800);
-                } else {
-                    showErrorModal(`Gagal melakukan tes ping Webhook. Status HTTP ${res.status}`);
-                }
-            })
-            .catch(() => {
-                hideLoader();
-                showErrorModal('Gagal menghubungi Webhook URL. Pastikan koneksi internet stabil.');
-            });
-        }
-
-        // WEBHOOK MODAL CONTROLS
-        function openWebhookModal() {
-            const input = document.getElementById('webhookInput');
-            if (input) input.value = webhookUrl;
-            const modal = document.getElementById('webhookModal');
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function closeWebhookModal() {
-            const modal = document.getElementById('webhookModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function saveWebhookSettings() {
-            const newUrl = document.getElementById('webhookInput').value.trim();
-            webhookUrl = newUrl;
-            localStorage.setItem('biker_webhook', webhookUrl);
-            showLoader('TERSIMPAN', 'Pengaturan Webhook berhasil disimpan!', 800, () => {
-                closeWebhookModal();
             });
         }
     </script>
