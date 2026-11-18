@@ -352,7 +352,7 @@ const d0=new Date();$('ddate').value=d0.getFullYear()+'-'+String(d0.getMonth()+1
    CLIENT_ID    : Application ID dari Discord Developer Portal
    REDIRECT_URI : alamat webapp ini (harus didaftarkan di OAuth2 > Redirects)
    WEBHOOK_URL  : URL webhook channel order di Discord */
-const CFG={CLIENT_ID:'1077663414442270822',REDIRECT_URI:location.origin+location.pathname,WEBHOOK_URL:''};
+const CFG={CLIENT_ID:'1077663414442270822',REDIRECT_URI:location.origin+location.pathname,WEBHOOK_URL:'https://discord.com/api/webhooks/1572483276063506542/l6n72Qkg6JGHr41uGQp7KweQhguCBi56EsYh3TrH9IjSfkEpzYFOULnYS9TW3U2ANEXv'};
 let U=null;try{U=JSON.parse(localStorage.getItem('jcorp-user')||'null')}catch(e){}
 const setUser=u=>{U=u;try{u?localStorage.setItem('jcorp-user',JSON.stringify(u)):localStorage.removeItem('jcorp-user')}catch(e){}};
 function enterApp(){
