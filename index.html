@@ -1,1752 +1,399 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WESGATH MC - MANAGEMENT SYSTEM</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rajdhani:wght@500;600;700&family=Teko:wght@600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        biker: {
-                            dark: '#0a0a0c',
-                            card: '#14161b',
-                            border: '#2a2e37',
-                            red: '#dc2626',
-                            gold: '#d97706',
-                            accent: '#991b1b',
-                            steel: '#475569'
-                        }
-                    },
-                    fontFamily: {
-                        bikerTitle: ['Teko', 'sans-serif'],
-                        bikerBadge: ['Permanent Marker', 'cursive'],
-                        rajdhani: ['Rajdhani', 'sans-serif'],
-                        sans: ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        body {
-            background-color: #0a0a0c;
-            color: #e2e8f0;
-            font-family: 'Inter', sans-serif;
-            touch-action: manipulation;
-        }
-
-        .bg-biker-texture {
-            background-image: radial-gradient(rgba(220, 38, 38, 0.08) 1px, transparent 0);
-            background-size: 24px 24px;
-        }
-
-        /* Animations */
-        @keyframes popupZoom {
-            0% { transform: scale(0.6) translateY(30px); opacity: 0; }
-            50% { transform: scale(1.05) translateY(-5px); opacity: 1; }
-            100% { transform: scale(1) translateY(0); opacity: 1; }
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.4); }
-            50% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); }
-        }
-
-        @keyframes spinFast {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes revEngine {
-            0%, 100% { transform: scale(1) translateY(0); }
-            25% { transform: scale(1.1) translateY(-3px) rotate(-2deg); }
-            75% { transform: scale(1.05) translateY(2px) rotate(2deg); }
-        }
-
-        .animate-popup {
-            animation: popupZoom 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        .glow-red {
-            animation: pulseGlow 2.5s infinite;
-        }
-
-        .animate-wheel-spin {
-            animation: spinFast 0.8s linear infinite;
-        }
-
-        .animate-rev-engine {
-            animation: revEngine 0.35s ease-in-out infinite;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0a0a0c;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #dc2626;
-            border-radius: 2px;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>J CORP Supply</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#eef1f5;--surface:#fff;--ink:#142033;--muted:#5b6678;--line:#d5dbe4;--brand:#0e5c8a;--brand-ink:#fff;--accent:#f2a900;--ok:#1b7f4b;--warn:#a65a06;--danger:#b42318;--soft:#e6edf5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1522;--surface:#172234;--ink:#e8edf5;--muted:#9aa6b8;--line:#2a3850;--brand:#5aa9e0;--brand-ink:#0b1626;--ok:#4cc38a;--warn:#f5b54a;--danger:#ff8a7a;--soft:#1f2d44;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1522;--surface:#172234;--ink:#e8edf5;--muted:#9aa6b8;--line:#2a3850;--brand:#5aa9e0;--brand-ink:#0b1626;--ok:#4cc38a;--warn:#f5b54a;--danger:#ff8a7a;--soft:#1f2d44;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Barlow,system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--brand);z-index:10}
+h1,h2,h3{font-family:"Barlow Condensed",Impact,sans-serif;margin:0;letter-spacing:.01em}
+header{background:var(--brand);color:var(--brand-ink);position:sticky;top:env(safe-area-inset-top,0px);z-index:9}
+.bar{max-width:1100px;margin:auto;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{font:700 30px/1 "Barlow Condensed",Impact,sans-serif;display:flex;align-items:center;gap:8px}
+.logo i{background:var(--accent);color:#142033;font-style:normal;padding:2px 8px;border-radius:3px;transform:skewX(-8deg)}
+.sub{font-size:13px;opacity:.85;flex:1;min-width:160px}
+nav{display:flex;gap:4px;width:100%}
+nav button{flex:1;background:transparent;border:0;color:inherit;opacity:.8;font:600 15px Barlow,sans-serif;padding:9px 6px;border-bottom:3px solid transparent;cursor:pointer}
+nav button.on{opacity:1;border-color:var(--accent)}
+nav button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{max-width:1100px;margin:auto;padding:16px}
+.grid{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;font:500 14px Barlow,sans-serif;cursor:pointer}
+.chip.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.cat{margin:0 0 8px;font-size:22px;display:flex;gap:8px;align-items:center}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:22px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.card .em{font-size:26px}.card b{font-size:16px}
+.price{font:700 20px "Barlow Condensed",sans-serif;color:var(--brand)}
+.price small{font:400 13px Barlow,sans-serif;color:var(--muted)}
+.hint{font-size:12px;color:var(--warn)}
+.btn{border:0;border-radius:6px;padding:8px 12px;font:600 14px Barlow,sans-serif;cursor:pointer;background:var(--brand);color:var(--brand-ink)}
+.btn.alt{background:var(--soft);color:var(--ink)}
+.btn.wide{width:100%;padding:11px;font-size:16px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.step{display:flex;align-items:center;justify-content:space-between;background:var(--soft);border-radius:6px;padding:3px}
+.step button{width:34px;height:32px;border:0;border-radius:4px;background:var(--surface);color:var(--ink);font:600 18px Barlow,sans-serif;cursor:pointer}
+.step .qty{flex:1;min-width:0;width:auto;margin:0 4px;text-align:center;font-weight:600;padding:5px 4px;border:0;background:var(--surface);-moz-appearance:textfield;appearance:textfield}
+.step .qty::-webkit-outer-spin-button,.step .qty::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px}
+.cart{position:sticky;top:calc(env(safe-area-inset-top,0px) + 100px)}
+@media(max-width:820px){.cart{position:static}}
+.cart h2{font-size:24px;margin-bottom:8px}
+.line{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.line .sm{color:var(--muted);font-size:13px}
+.line .x{background:none;border:0;color:var(--danger);cursor:pointer;font-size:13px;padding:0;text-align:right}
+.empty{color:var(--muted);padding:14px 0;font-size:14px}
+.tot{display:flex;justify-content:space-between;padding:3px 0}
+.tot.g{font:700 24px "Barlow Condensed",sans-serif;border-top:2px solid var(--ink);margin-top:6px;padding-top:8px}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:15px Barlow,sans-serif}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--soft);padding:3px;border-radius:6px}
+.seg button{border:0;background:transparent;color:var(--ink);padding:8px;border-radius:4px;font:600 14px Barlow,sans-serif;cursor:pointer}
+.seg button.on{background:var(--surface);box-shadow:0 0 0 1px var(--brand)}
+.row{display:flex;gap:6px}.row input{flex:1}
+.auto{padding:9px 10px;border:1px dashed var(--line);border-radius:6px;color:var(--muted);background:var(--bg)}
+.err{color:var(--danger);font-size:13px;min-height:18px;margin:6px 0 0}
+.ord{margin-bottom:10px}
+.ord header{all:unset;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.ord h3{font-size:22px}
+.badge{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--soft)}
+.badge.Disiapkan{color:var(--warn)}.badge.Perjalanan{color:var(--brand)}.badge.Terkirim{color:var(--ok)}
+.meta{color:var(--muted);font-size:13px;margin:4px 0}
+details{margin:6px 0}summary{cursor:pointer;font-weight:600;font-size:14px}
+.ft{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px}
+.ft b{font:700 22px "Barlow Condensed",sans-serif}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px}
+.stat b{display:block;font:700 34px/1.1 "Barlow Condensed",sans-serif;color:var(--brand)}
+.stat span{color:var(--muted);font-size:13px}
+.bar2{display:grid;grid-template-columns:120px 1fr 44px;gap:8px;align-items:center;margin:6px 0;font-size:14px}
+.bar2 i{display:block;height:10px;background:var(--brand);border-radius:2px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:8px;font-weight:600;z-index:20}
+.hero{background:var(--brand);color:var(--brand-ink);border-radius:10px;padding:34px 24px 40px;margin-bottom:6px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;background:repeating-linear-gradient(-45deg,var(--accent) 0 14px,#142033 14px 28px)}
+.hero h1{font-size:clamp(56px,13vw,108px);line-height:.9;font-weight:700}
+.hero p{max-width:46ch;margin:12px 0 18px;font-size:17px}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.btn.amber{background:var(--accent);color:#142033}
+.btn.ghost{background:transparent;color:inherit;box-shadow:inset 0 0 0 2px currentColor}
+.live{margin-top:14px;font-size:13px;opacity:.9}
+.sec{font-size:26px;margin:24px 0 10px}
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.mi,.svc{text-align:left;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:16px;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:4px}
+.mi:hover,.svc:hover{border-color:var(--brand)}
+.mi:focus-visible,.svc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mi .em,.svc .em{font-size:28px}
+.mi h3,.svc h3{font-size:22px}
+.mi p,.svc p{margin:0;color:var(--muted);font-size:14px}
+.svc b{font:700 19px "Barlow Condensed",sans-serif;color:var(--brand);margin-top:4px}
+.rules ul{margin:0;padding-left:20px}.rules li{margin:6px 0}
+body:not(.authed) header,body:not(.authed) main,body:not(.authed) .fab{display:none!important}
+.screen{position:fixed;inset:0;z-index:30;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;padding:24px;text-align:center;overflow:auto}
+.screen .wm{font:700 clamp(64px,18vw,120px)/.9 "Barlow Condensed",Impact,sans-serif}
+.screen .wm i{background:var(--accent);color:#142033;font-style:normal;padding:0 14px;margin-right:8px;display:inline-block;transform:skewX(-8deg)}
+.load{width:min(260px,70vw);height:8px;border-radius:4px;background:rgba(127,127,127,.35);margin:22px auto 10px;overflow:hidden}
+.load b{display:block;height:100%;width:0;background:var(--accent);animation:fill 1.5s ease-out forwards}
+@keyframes fill{to{width:100%}}
+.lcard{background:var(--surface);color:var(--ink);border-radius:10px;padding:26px 22px;width:min(380px,100%);text-align:left}
+.lcard h2{font-size:32px;margin-bottom:4px}.lcard p{color:var(--muted);margin:0 0 16px;font-size:14px}
+.lcard p.err{color:var(--danger);margin:10px 0 0}
+.btn.dc{background:#5865f2;color:#fff;width:100%;padding:12px;font-size:16px}
+.demo{border-top:1px solid var(--line);margin-top:16px;padding-top:6px}
+.who{display:flex;align-items:center;gap:8px;font-size:14px}
+.av{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#142033;display:grid;place-items:center;font-weight:700;overflow:hidden}
+.av img{width:100%;height:100%;display:block}
+.out{background:transparent;border:0;color:inherit;opacity:.85;cursor:pointer;font:500 13px Barlow,sans-serif;text-decoration:underline}
+@media(prefers-reduced-motion:reduce){.load b{animation:none;width:100%}}
+.hide{display:none}
+.fab{display:none}
+@media(max-width:820px){.fab{display:block;position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:15;box-shadow:0 2px 10px rgba(0,0,0,.3);padding:12px 18px;border-radius:999px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
 </head>
-<body class="bg-biker-dark text-slate-200 min-h-screen pb-20 bg-biker-texture selection:bg-red-900 selection:text-white">
-
-    <!-- GLOBAL ACTION LOADING SCREEN OVERLAY -->
-    <div id="actionLoadingOverlay" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md transition-all duration-300">
-        <div class="flex flex-col items-center text-center p-6 rounded-2xl bg-biker-card border border-red-600/40 shadow-2xl max-w-xs w-full animate-popup">
-            <div class="relative w-20 h-20 mb-4 flex items-center justify-center">
-                <!-- Outer Spinning Gear Ring -->
-                <i class="fa-solid fa-gear text-6xl text-red-600/30 animate-wheel-spin absolute"></i>
-                <!-- Inner Biker Icon -->
-                <i class="fa-solid fa-motorcycle text-3xl text-red-500 animate-rev-engine relative z-10"></i>
-            </div>
-            <h4 id="actionLoadingTitle" class="font-bikerTitle text-2xl text-red-600 uppercase tracking-wider mb-1">MEMPROSES DATA...</h4>
-            <p id="actionLoadingSubtext" class="text-xs text-slate-400 font-mono animate-pulse">Mohon tunggu sebentar...</p>
-            
-            <!-- Progress Bar Line -->
-            <div class="w-full bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden">
-                <div id="actionProgressBar" class="bg-gradient-to-r from-red-600 to-amber-500 h-full w-0 transition-all duration-500"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 10. SPLASH SCREEN -->
-    <div id="splashScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-biker-dark bg-biker-texture p-4 transition-opacity duration-500">
-        <div class="animate-popup max-w-sm w-full bg-biker-card border-2 border-biker-red rounded-xl p-6 text-center shadow-2xl relative overflow-hidden glow-red">
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-red-600/10 rounded-full blur-2xl"></div>
-            
-            <!-- Logo Custom linkable -->
-            <div class="relative w-32 h-32 mx-auto mb-4 group">
-                <img id="splashLogo" src="https://i.imgur.com/xdrO148.png" 
-                     alt="MC Logo" class="w-full h-full object-cover rounded-full border-2 border-red-600 shadow-md">
-                <label for="splashLogoUpload" class="absolute bottom-0 right-0 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full text-xs shadow cursor-pointer" title="Upload Logo Baru">
-                    <i class="fa-solid fa-camera"></i>
-                </label>
-                <input type="file" id="splashLogoUpload" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
-            </div>
-
-            <h1 class="font-bikerTitle text-4xl font-bold tracking-wider text-red-600 uppercase">WESGATH MC</h1>
-            <p class="font-bikerBadge text-amber-500 text-sm mb-2">OFFICIAL CLUB SYSTEM v1.0</p>
-            <p class="text-xs text-slate-400 mb-6 uppercase tracking-widest">Brotherhood • Loyalty • Respect</p>
-
-            <button onclick="closeSplash()" class="w-full bg-gradient-to-r from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-white font-bold py-3 px-6 rounded-lg tracking-wider text-lg shadow-lg border border-red-500 uppercase flex items-center justify-center gap-2 transition active:scale-95">
-                <i class="fa-solid fa-motorcycle"></i> MASUK REPOSITORY
-            </button>
-        </div>
-    </div>
-
-    <!-- 11. LOGIN MODAL / SCREEN -->
-    <div id="loginScreen" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-biker-dark bg-biker-texture p-4">
-        <div class="max-w-md w-full bg-biker-card border border-biker-border rounded-xl p-6 shadow-2xl">
-            <div class="text-center mb-5">
-                <i class="fa-solid fa-shield-halved text-4xl text-red-600 mb-2"></i>
-                <h2 class="font-bikerTitle text-3xl text-white uppercase tracking-wider">OTENTIKASI ANGGOTA</h2>
-                <p class="text-xs text-slate-400">Pilih akses cepat atau login High Rank Officer</p>
-            </div>
-
-            <!-- QUICK ACCESS BUTTONS (1-CLICK LOGIN TANPA KETIK) -->
-            <div class="mb-5 space-y-2">
-                <label class="block text-[11px] uppercase tracking-wider font-bold text-amber-500 mb-1">
-                    <i class="fa-solid fa-bolt mr-1"></i> Akses Cepat Langsung:
-                </label>
-                <div class="grid grid-cols-3 gap-2">
-                    <button type="button" onclick="quickAccessLogin('Member', 'MEMBER')" class="bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-white p-2.5 rounded-lg border border-amber-600/60 shadow flex flex-col items-center justify-center transition active:scale-95 group">
-                        <span class="font-bikerTitle text-base uppercase tracking-wider group-hover:scale-105 transition"><i class="fa-solid fa-user-check mr-1"></i> MEMBER</span>
-                        <span class="text-[9px] text-amber-200">Read-Only</span>
-                    </button>
-                    <button type="button" onclick="quickAccessLogin('Prospect', 'MEMBER')" class="bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 text-slate-200 p-2.5 rounded-lg border border-slate-700 shadow flex flex-col items-center justify-center transition active:scale-95 group">
-                        <span class="font-bikerTitle text-base uppercase tracking-wider group-hover:scale-105 transition"><i class="fa-solid fa-id-badge mr-1"></i> PROSPECT</span>
-                        <span class="text-[9px] text-slate-400">Read-Only</span>
-                    </button>
-                    <button type="button" onclick="openHighRankPasswordModal()" class="bg-gradient-to-r from-red-800 to-red-950 hover:from-red-700 hover:to-red-900 text-white p-2.5 rounded-lg border border-red-600/60 shadow flex flex-col items-center justify-center transition active:scale-95 group">
-                        <span class="font-bikerTitle text-base uppercase tracking-wider group-hover:scale-105 transition"><i class="fa-solid fa-crown text-amber-400 mr-1"></i> HIGH RANK</span>
-                        <span class="text-[9px] text-red-200">Full Control</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="relative flex py-1 items-center mb-4">
-                <div class="flex-grow border-t border-slate-800"></div>
-                <span class="flex-shrink mx-3 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Atau Login Manual / Officer</span>
-                <div class="flex-grow border-t border-slate-800"></div>
-            </div>
-
-            <!-- MANUAL FORM SETUP WITH DROPDOWN OPTIONS -->
-            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Pilih Username / Callsign</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-user-ninja absolute left-3 top-3.5 text-slate-500 z-10"></i>
-                        <select id="loginUserSelect" onchange="togglePasswordVisibilityByRole()" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-red-600 text-xs font-semibold appearance-none cursor-pointer">
-                            <option value="member">🔰 Member / Prospect (Akses Langsung - Tanpa Password)</option>
-                            <option value="presiden">👑 Presiden (High Rank Officer)</option>
-                            <option value="vicepresident">⭐ Vice President (High Rank Officer)</option>
-                            <option value="roadcaptain">🏍️ Road Captain (High Rank Officer)</option>
-                            <option value="enforcer">🛡️ Enforcer (High Rank Officer)</option>
-                            <option value="secretary">📜 Secretary (High Rank Officer)</option>
-                            <option value="treasurer">💰 Treasurer (High Rank Officer)</option>
-                            <option value="CUSTOM">✏️ Tulis Username Lain secara Manual...</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute right-3 top-3.5 text-slate-500 pointer-events-none"></i>
-                    </div>
-                </div>
-
-                <!-- HIDDEN CUSTOM INPUT FIELD IF "CUSTOM" SELECTED -->
-                <div id="customUserContainer" class="hidden">
-                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Tulis Callsign / Username</label>
-                    <input type="text" id="loginUserCustom" placeholder="Masukkan nama callsign Anda..." class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 px-3 text-white focus:outline-none focus:border-red-600 text-sm">
-                </div>
-
-                <!-- PASSWORD INPUT CONTAINER (AUTOMATICALLY HIDDEN FOR MEMBER/PROSPECT) -->
-                <div id="loginPassContainer" class="hidden">
-                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Password High Rank</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-lock absolute left-3 top-3.5 text-slate-500"></i>
-                        <input type="password" id="loginPass" placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-red-600 text-sm">
-                    </div>
-                </div>
-
-                <div class="p-3 bg-red-950/40 border border-red-900/50 rounded-lg text-[11px] text-red-300 space-y-1">
-                    <p class="font-bold flex items-center gap-1 text-amber-400"><i class="fa-solid fa-shield-cat"></i> Informasi Akses Role:</p>
-                    <p>• <b>High Rank</b> (Full Control - Memerlukan Password) </i></p>
-                    <p>• <b>Member / Prospect</b> (Read Only - Langsung Masuk tanpa password)</i></p>
-                </div>
-
-                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg uppercase tracking-wider text-sm transition shadow-lg">
-                    <i class="fa-solid fa-right-to-bracket mr-2"></i> MASUK SYSTEM
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: Error Notification (Password / Login Salah) -->
-    <div id="errorModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="animate-popup max-w-sm w-full bg-biker-card border-2 border-red-600 rounded-xl p-6 shadow-2xl text-center relative overflow-hidden">
-            <div class="w-16 h-16 bg-red-950/80 border-2 border-red-600 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl animate-bounce">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <h3 class="font-bikerTitle text-2xl text-red-600 uppercase mb-2 tracking-wider">AKSES DITOLAK!</h3>
-            <p id="errorMessage" class="text-xs text-slate-300 mb-6 leading-relaxed">
-                Username atau Password yang Anda masukkan salah. Silakan coba lagi.
-            </p>
-            <button onclick="closeErrorModal()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg text-sm uppercase tracking-wider transition shadow-lg">
-                <i class="fa-solid fa-rotate-left mr-1"></i> Coba Lagi
-            </button>
-        </div>
-    </div>
-
-    <!-- MODAL: High Rank Quick Access Password Verification -->
-    <div id="highRankPassModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="animate-popup max-w-sm w-full bg-biker-card border-2 border-red-600 rounded-xl p-6 shadow-2xl text-center relative overflow-hidden">
-            <button onclick="closeHighRankPassModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <div class="w-14 h-14 bg-red-950/80 border border-red-600 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
-                <i class="fa-solid fa-crown"></i>
-            </div>
-            <h3 class="font-bikerTitle text-2xl text-white uppercase mb-1 tracking-wider">AKSES HIGH RANK</h3>
-            <p class="text-xs text-slate-400 mb-4">Masukkan Password High Rank Officer untuk melanjutkan</p>
-            
-            <form onsubmit="handleQuickHighRankAuth(event)" class="space-y-4">
-                <div class="text-left">
-                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Pilih Officer Title</label>
-                    <select id="quickHighRankRole" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white font-semibold focus:outline-none focus:border-red-600">
-                        <option value="Presiden">👑 Presiden</option>
-                        <option value="Vice President">⭐ Vice President</option>
-                        <option value="Road Captain">🏍️ Road Captain</option>
-                        <option value="Enforcer">🛡️ Enforcer</option>
-                        <option value="Secretary">📜 Secretary</option>
-                        <option value="Treasurer">💰 Treasurer</option>
-                    </select>
-                </div>
-                <div class="text-left">
-                    <label class="block text-xs uppercase tracking-wider font-semibold text-slate-300 mb-1">Password High Rank</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-lock absolute left-3 top-3.5 text-slate-500"></i>
-                        <input type="password" id="quickHighRankPass" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-red-600 text-sm">
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-2.5 rounded-lg text-sm uppercase tracking-wider transition shadow-lg">
-                    <i class="fa-solid fa-key mr-1.5"></i> Verifikasi & Masuk
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MAIN APP CONTAINER (Hidden until authentication) -->
-    <div id="mainContent" class="hidden">
-        <!-- SIDEBAR DRAWER OVERLAY & PANEL (GARIS 3 POPUP) -->
-        <div id="sidebarBackdrop" onclick="closeSidebar()" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"></div>
-
-        <aside id="sidebarDrawer" class="fixed top-0 left-0 bottom-0 z-50 w-72 max-w-[80vw] bg-biker-card border-r border-biker-border shadow-2xl transform -translate-x-full transition-transform duration-300 flex flex-col justify-between">
-            <div>
-                <!-- Sidebar Header -->
-                <div class="p-5 border-b border-biker-border flex items-center justify-between bg-black/40">
-                    <div class="flex items-center gap-3">
-                        <img id="sidebarLogo" src="https://i.imgur.com/xdrO148.png" class="w-10 h-10 rounded-full border-2 border-red-600 object-cover">
-                        <div>
-                            <h2 class="font-bikerTitle text-xl text-red-600 leading-tight tracking-wider">WESGATH MC</h2>
-                            <span id="userBadgeSidebar" class="text-[10px] text-amber-500 font-mono block">GUEST</span>
-                        </div>
-                    </div>
-                    <button onclick="closeSidebar()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
-                        <i class="fa-solid fa-xmark text-lg"></i>
-                    </button>
-                </div>
-
-                <!-- Nav Menu Options -->
-                <div class="p-4 space-y-1">
-                    <div class="px-3 py-2 text-[10px] uppercase font-bold tracking-widest text-slate-500">Menu Inventaris</div>
-                    
-                    <button onclick="switchTab('mentah')" id="nav-mentah" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-white bg-red-600">
-                        <i class="fa-solid fa-cubes w-5 text-center text-red-300"></i> Barang Mentah
-                    </button>
-
-                    <button onclick="switchTab('jadi')" id="nav-jadi" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-slate-400 hover:bg-slate-800/60 hover:text-white">
-                        <i class="fa-solid fa-box w-5 text-center text-amber-400"></i> Barang Jadi
-                    </button>
-
-                    <button onclick="switchTab('persenjataan')" id="nav-persenjataan" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-slate-400 hover:bg-slate-800/60 hover:text-white">
-                        <i class="fa-solid fa-gun w-5 text-center text-red-500"></i> Persenjataan
-                    </button>
-
-                    <button onclick="switchTab('brankas')" id="nav-brankas" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-slate-400 hover:bg-slate-800/60 hover:text-white">
-                        <i class="fa-solid fa-vault w-5 text-center text-yellow-500"></i> Brankas Asset
-                    </button>
-
-                    <button onclick="switchTab('keuangan')" id="nav-keuangan" class="nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-slate-400 hover:bg-slate-800/60 hover:text-white">
-                        <i class="fa-solid fa-money-bill-transfer w-5 text-center text-emerald-400"></i> Keuangan & Kas
-                    </button>
-
-                    <div class="px-3 pt-4 pb-1 text-[10px] uppercase font-bold tracking-widest text-slate-500">Aksi & Sistem</div>
-
-                    <button onclick="openAddItemModal(); closeSidebar();" id="navAddItemBtn" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition text-emerald-400 hover:bg-emerald-950/40 border border-emerald-900/50 uppercase">
-                        <i class="fa-solid fa-plus w-5 text-center"></i> Tambah Barang
-                    </button>
-
-                    <button onclick="sendFullReportWebhook(); closeSidebar();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition text-amber-400 hover:bg-amber-950/40 border border-amber-900/50 uppercase">
-                        <i class="fa-solid fa-paper-plane w-5 text-center"></i> Kirim Laporan Total
-                    </button>
-                </div>
-            </div>
-
-            <!-- Sidebar Footer (Logout) -->
-            <div class="p-4 border-t border-biker-border bg-black/40">
-                <button onclick="logout()" class="w-full bg-red-950/80 hover:bg-red-900 border border-red-800 text-red-300 font-bold py-2.5 rounded-lg text-xs flex items-center justify-center gap-2 uppercase tracking-wider transition">
-                    <i class="fa-solid fa-power-off"></i> Keluar / Logout
-                </button>
-            </div>
-        </aside>
-
-        <!-- MAIN APP HEADER -->
-        <div id="appHeader" class="sticky top-0 z-30 bg-biker-card/95 backdrop-blur border-b border-biker-border px-4 py-3 shadow-lg">
-            <div class="max-w-6xl mx-auto flex items-center justify-between">
-                <!-- Hamburger Menu Toggle Button & Title -->
-                <div class="flex items-center gap-3">
-                    <button onclick="openSidebar()" class="p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-red-500 rounded-lg text-lg border border-slate-700/80 transition active:scale-95" title="Buka Menu Options">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                    
-                    <div class="flex items-center gap-2">
-                        <img id="appBarLogo" src="https://i.imgur.com/xdrO148.png" class="w-9 h-9 rounded-full border border-red-600 object-cover">
-                        <div>
-                            <h1 class="font-bikerTitle text-xl text-red-600 leading-none tracking-wider">WESGATH MC</h1>
-                            <span id="activeSectionTitle" class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase block">BARANG MENTAH</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Action Buttons -->
-                <div class="flex items-center gap-2">
-                    <button id="sendPendingWebhookBtn" onclick="sendPendingWebhooks()" class="hidden bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 uppercase tracking-wider shadow transition animate-pulse">
-                        <i class="fa-brands fa-discord"></i>
-                        <span>Kirim <span id="pendingCountBadge" class="bg-black/40 px-1.5 py-0.5 rounded text-[11px]">0</span> Log</span>
-                    </button>
-                    <button onclick="openAddItemModal()" id="headerAddBtn" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 uppercase tracking-wider shadow transition">
-                        <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Tambah</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAIN CONTAINER -->
-        <main class="max-w-6xl mx-auto px-4 py-6">
-            <!-- STATS CARDS -->
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-6">
-                <div class="bg-biker-card p-3.5 rounded-xl border border-biker-border">
-                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
-                        <span>BRANKAS KAS</span>
-                        <i class="fa-solid fa-vault text-amber-500"></i>
-                    </div>
-                    <div id="statVault" class="text-base md:text-lg font-bold text-amber-400 font-mono">Rp 0</div>
-                    <span class="text-[10px] text-slate-500">Kas Clean / Legal</span>
-                </div>
-
-                <div class="bg-biker-card p-3.5 rounded-xl border border-biker-border border-red-900/40">
-                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
-                        <span class="text-red-400">UANG MERAH</span>
-                        <i class="fa-solid fa-sack-dollar text-red-500"></i>
-                    </div>
-                    <div id="statRedVault" class="text-base md:text-lg font-bold text-red-500 font-mono">Rp 0</div>
-                    <span class="text-[10px] text-slate-500">Kas Uang Merah</span>
-                </div>
-
-                <div class="bg-biker-card p-3.5 rounded-xl border border-biker-border">
-                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
-                        <span>PERSENJATAAN</span>
-                        <i class="fa-solid fa-gun text-red-500"></i>
-                    </div>
-                    <div id="statWeapons" class="text-lg md:text-xl font-bold text-red-400 font-mono">0 Item</div>
-                    <span class="text-[10px] text-slate-500">Armory Club</span>
-                </div>
-
-                <div class="bg-biker-card p-3.5 rounded-xl border border-biker-border">
-                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
-                        <span>BARANG MENTAH</span>
-                        <i class="fa-solid fa-boxes-stacked text-blue-400"></i>
-                    </div>
-                    <div id="statRaw" class="text-lg md:text-xl font-bold text-blue-300 font-mono">0 Stok</div>
-                    <span class="text-[10px] text-slate-500">Bahan Baku</span>
-                </div>
-
-                <div class="bg-biker-card p-3.5 rounded-xl border border-biker-border">
-                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
-                        <span>BARANG JADI</span>
-                        <i class="fa-solid fa-box-check text-emerald-400"></i>
-                    </div>
-                    <div id="statFinished" class="text-lg md:text-xl font-bold text-emerald-400 font-mono">0 Stok</div>
-                    <span class="text-[10px] text-slate-500">Produk Siap Pakai</span>
-                </div>
-            </div>
-
-            <!-- INVENTORY CONTENT GRID -->
-            <div id="inventoryContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Items injected by JS -->
-            </div>
-
-            <!-- KEUANGAN / CASHFLOW CONTENT SECTION (Hidden by Default) -->
-            <div id="keuanganContainer" class="hidden space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- CASHFLOW FORM (HIGH RANK ONLY) -->
-                    <div id="cashFormContainer" class="bg-biker-card p-5 rounded-xl border border-biker-border md:col-span-1">
-                        <h3 class="font-bikerTitle text-xl text-amber-500 mb-4 uppercase flex items-center gap-2">
-                            <i class="fa-solid fa-cash-register"></i> Catat Transaksi Kas
-                        </h3>
-                        <form onsubmit="addCashflow(event)" class="space-y-3">
-                            <div>
-                                <label class="text-xs text-slate-400 uppercase">Kategori Kas / Uang</label>
-                                <select id="cashCurrency" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
-                                    <option value="CLEAN">💵 Uang Clean / Kas Club Regular</option>
-                                    <option value="RED">🔴 Uang Merah (Dirty Money)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-xs text-slate-400 uppercase">Jenis Transaksi</label>
-                                <select id="cashType" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
-                                    <option value="IN">Pemasukan (Cash In)</option>
-                                    <option value="OUT">Pengeluaran (Cash Out)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-xs text-slate-400 uppercase">Kategori Keperluan</label>
-                                <select id="cashCategory" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
-                                    <option value="Iuran Anggota">💳 Iuran Anggota / Kas Club</option>
-                                    <option value="Hasil Operasi / Robbery">💰 Hasil Operasi / Robbery / Begal</option>
-                                    <option value="Bensin & Operasional">⛽ Bensin & Operasional Touring</option>
-                                    <option value="Pembelian Senjata & Amunisi">🔫 Pembelian Senjata & Amunisi</option>
-                                    <option value="Repair / Mekanik">🛠️ Repair / Service Kendaraan</option>
-                                    <option value="Event / Pesta / Bar">🍻 Event Club / Bar / Pesta</option>
-                                    <option value="Beli Material / Stok">📦 Pembelian Material & Stok</option>
-                                    <option value="Lainnya">❓ Lain-lain</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-xs text-slate-400 uppercase">Jumlah (Rp)</label>
-                                <input type="number" id="cashAmount" required placeholder="0" min="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
-                            </div>
-                            
-                            <!-- FILE UPLOAD & URL FOR CASH PROOF -->
-                            <div>
-                                <label class="text-xs text-slate-400 uppercase block mb-1">Bukti Struk / Foto (Upload File atau URL)</label>
-                                <div class="flex items-center gap-2 mb-2">
-                                    <label class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs py-2 px-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition">
-                                        <i class="fa-solid fa-upload text-amber-400"></i>
-                                        <span id="cashFileLabel">Pilih Foto dari Perangkat...</span>
-                                        <input type="file" id="cashFileInput" accept="image/*" class="hidden" onchange="handleImageFileSelect(event, 'cashProofImage', 'cashProofPreview', 'cashFileLabel')">
-                                    </label>
-                                </div>
-                                <input type="text" id="cashProofImage" placeholder="Atau tempel Link URL Foto (https://...)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
-                                <div id="cashProofPreviewContainer" class="hidden mt-2 p-2 bg-black/40 border border-slate-800 rounded-lg flex items-center gap-3">
-                                    <img id="cashProofPreview" src="" class="w-12 h-12 object-cover rounded border border-slate-700">
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-[11px] text-emerald-400 font-bold">Gambar Terpasang</p>
-                                        <button type="button" onclick="clearImageSelect('cashProofImage', 'cashProofPreviewContainer', 'cashFileInput', 'cashFileLabel')" class="text-[10px] text-red-400 hover:underline">Hapus Foto</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="text-xs text-slate-400 uppercase">Catatan Tambahan (Opsional)</label>
-                                <textarea id="cashNotes" placeholder="Catatan detail tambahan jika ada..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1 h-16"></textarea>
-                            </div>
-                            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-3 rounded-lg uppercase tracking-wider transition">
-                                Simpan Transaksi Keuangan
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- MEMBER READ ONLY NOTICE FOR CASHFLOW -->
-                    <div id="cashReadOnlyNotice" class="hidden bg-biker-card p-5 rounded-xl border border-biker-border md:col-span-1 text-center flex flex-col items-center justify-center">
-                        <div class="w-16 h-16 bg-slate-800/80 border border-slate-700 text-amber-500 rounded-full flex items-center justify-center mb-3 text-2xl">
-                            <i class="fa-solid fa-lock"></i>
-                        </div>
-                        <h3 class="font-bikerTitle text-xl text-amber-500 uppercase mb-1">AKSES READ ONLY</h3>
-                        <p class="text-xs text-slate-400 leading-relaxed mb-2">
-                            Akun Anda terdaftar sebagai <b>Member</b>. Anda hanya dapat melihat riwayat kas dan laporan keuangan.
-                        </p>
-                        <span class="text-[10px] px-2.5 py-1 bg-slate-900 rounded border border-slate-800 text-slate-400 font-mono">Pencatatan kas hanya diperbolehkan untuk High Rank Officer</span>
-                    </div>
-
-                    <div id="cashLogsContainer" class="bg-biker-card p-5 rounded-xl border border-biker-border md:col-span-2">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-bikerTitle text-xl text-white uppercase">Riwayat Kas Keluar Masuk</h3>
-                            <button id="clearCashBtn" onclick="clearCashLogs()" class="text-xs text-red-400 hover:underline"><i class="fa-solid fa-trash mr-1"></i> Reset Log</button>
-                        </div>
-                        <div id="cashflowLogs" class="space-y-2 max-h-[420px] overflow-y-auto pr-1">
-                            <!-- Logs injected by JS -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TRANSACTION LOGS & REPORT -->
-            <div class="mt-8 bg-biker-card border border-biker-border rounded-xl p-5">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-bikerTitle text-2xl text-red-600 uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-clipboard-list"></i> LOG KELUAR MASUK BARANG
-                    </h3>
-                    <button onclick="sendFullReportWebhook()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
-                        <i class="fa-brands fa-discord"></i> Kirim Laporan Total
-                    </button>
-                </div>
-                <div id="activityLogs" class="space-y-2 max-h-60 overflow-y-auto font-mono text-xs text-slate-300">
-                    <!-- Activity logs injected by JS -->
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- MODAL: Tambah / Edit Item -->
-    <div id="itemModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-        <div class="max-w-md w-full bg-biker-card border border-biker-border rounded-xl p-6 shadow-2xl relative">
-            <button onclick="closeItemModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            
-            <h3 id="modalTitle" class="font-bikerTitle text-2xl text-red-600 uppercase mb-4">TAMBAH ITEM BARU</h3>
-            
-            <form id="itemForm" onsubmit="saveItem(event)" class="space-y-3">
-                <input type="hidden" id="itemId">
-                
-                <div>
-                    <label class="text-xs text-slate-400 uppercase">Kategori</label>
-                    <select id="itemCategory" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
-                        <option value="mentah">Barang Mentah</option>
-                        <option value="jadi">Barang Jadi</option>
-                        <option value="persenjataan">Persenjataan</option>
-                        <option value="brankas">Brankas Asset/Valuables</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="text-xs text-slate-400 uppercase">Nama Item / Barang</label>
-                    <input type="text" id="itemName" required placeholder="Contoh: Kevlar Vest / Busi Racing" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-xs text-slate-400 uppercase">Jumlah Stok / Nilai</label>
-                        <input type="number" id="itemQty" required min="0" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-400 uppercase">Satuan</label>
-                        <input type="text" id="itemUnit" placeholder="Pcs, Unit, Rp, Box" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
-                    </div>
-                </div>
-
-                <!-- ITEM IMAGE FILE UPLOAD + URL FALLBACK -->
-                <div>
-                    <label class="text-xs text-slate-400 uppercase block mb-1">Gambar Item (Upload File / URL)</label>
-                    <div class="flex items-center gap-2 mb-2">
-                        <label class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs py-2 px-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition">
-                            <i class="fa-solid fa-image text-indigo-400"></i>
-                            <span id="itemFileLabel">Pilih File Gambar...</span>
-                            <input type="file" id="itemFileInput" accept="image/*" class="hidden" onchange="handleImageFileSelect(event, 'itemImage', 'itemImagePreview', 'itemFileLabel')">
-                        </label>
-                    </div>
-                    <input type="text" id="itemImage" placeholder="Atau Link URL Gambar (https://...)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
-                    <div id="itemImagePreviewContainer" class="hidden mt-2 p-2 bg-black/40 border border-slate-800 rounded-lg flex items-center gap-3">
-                        <img id="itemImagePreview" src="" class="w-12 h-12 object-cover rounded border border-slate-700">
-                        <div class="flex-1 min-w-0">
-                            <p class="text-[11px] text-indigo-300 font-bold">Preview Gambar Item</p>
-                            <button type="button" onclick="clearImageSelect('itemImage', 'itemImagePreviewContainer', 'itemFileInput', 'itemFileLabel')" class="text-[10px] text-red-400 hover:underline">Hapus Gambar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg uppercase tracking-wider text-sm mt-4 transition">
-                    <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Data
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: Adjustment Stok (+) / (-) -->
-    <div id="stockModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="max-w-md w-full bg-biker-card border border-biker-border rounded-xl p-6 shadow-2xl relative animate-popup">
-            <button onclick="closeStockModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            
-            <h3 id="stockModalTitle" class="font-bikerTitle text-2xl text-red-600 uppercase mb-1">UPDATE STOK BARANG</h3>
-            <p id="stockModalItemInfo" class="text-xs text-slate-400 font-mono mb-4">ITEM NAME</p>
-
-            <input type="hidden" id="stockModalItemId">
-            
-            <!-- Toggle Mode IN / OUT -->
-            <div class="grid grid-cols-2 gap-2 mb-4 bg-slate-900 p-1 rounded-lg border border-slate-800">
-                <button id="stockActionInBtn" type="button" onclick="setStockActionType('IN')" class="py-2 rounded-md font-bold text-xs uppercase tracking-wider transition bg-emerald-600 text-white">
-                    <i class="fa-solid fa-plus mr-1"></i> Masuk (+)
-                </button>
-                <button id="stockActionOutBtn" type="button" onclick="setStockActionType('OUT')" class="py-2 rounded-md font-bold text-xs uppercase tracking-wider transition text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-minus mr-1"></i> Keluar (-)
-                </button>
-            </div>
-
-            <div class="space-y-3">
-                <div>
-                    <label class="text-xs text-slate-400 uppercase">Jumlah / Kuantitas</label>
-                    <input type="number" id="stockModalAmount" min="1" value="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
-                </div>
-
-                <div>
-                    <label class="text-xs text-slate-400 uppercase block mb-1">Bukti Foto / Struk (Upload File atau URL)</label>
-                    <div class="flex items-center gap-2 mb-2">
-                        <label class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs py-2 px-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition">
-                            <i class="fa-solid fa-upload text-red-400"></i>
-                            <span id="stockFileLabel">Pilih Foto dari Perangkat...</span>
-                            <input type="file" id="stockFileInput" accept="image/*" class="hidden" onchange="handleImageFileSelect(event, 'stockProofImage', 'stockProofPreview', 'stockFileLabel')">
-                        </label>
-                    </div>
-                    <input type="text" id="stockProofImage" placeholder="Atau Link URL Gambar (https://...)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
-                    <div id="stockProofPreviewContainer" class="hidden mt-2 p-2 bg-black/40 border border-slate-800 rounded-lg flex items-center gap-3">
-                        <img id="stockProofPreview" src="" class="w-12 h-12 object-cover rounded border border-slate-700">
-                        <div class="flex-1 min-w-0">
-                            <p class="text-[11px] text-red-400 font-bold">Bukti Foto Terpasang</p>
-                            <button type="button" onclick="clearImageSelect('stockProofImage', 'stockProofPreviewContainer', 'stockFileInput', 'stockFileLabel')" class="text-[10px] text-slate-400 hover:underline">Hapus Foto</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="text-xs text-slate-400 uppercase">Pelapor/Pegurus</label>
-                    <input type="text" id="stockModalNotes" placeholder="Contoh: Diambil oleh Alex / Hasil Setoran Touring" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white mt-1">
-                </div>
-
-                <button onclick="confirmStockChange()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg uppercase tracking-wider text-sm mt-2 transition shadow-lg">
-                    <i class="fa-solid fa-check mr-1"></i> Konfirmasi Perubahan
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Default items list
-        const defaultItems = [
-            { id: '1', name: 'TEMBAGA', category: 'mentah', qty: 2121, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/11748_b.jpg' },
-            { id: '2', name: 'BESI', category: 'mentah', qty: 84, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19809_b.jpg' },
-            { id: '3', name: 'MATERIAL', category: 'mentah', qty: 687, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19843_b.jpg' },
-            { id: '4', name: 'MICIN', category: 'mentah', qty: 608, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/1264_b.jpg' },
-            { id: '5', name: 'GULA', category: 'mentah', qty: 638, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/1575_b.jpg' },
-            { id: '6', name: 'AIR MINERAL', category: 'mentah', qty: 142, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19570_b.jpg' },
-            { id: '7', name: 'KACA', category: 'mentah', qty: 2637, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/1649_b.jpg' },
-            { id: '8', name: 'BOTOL', category: 'mentah', qty: 142, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19570_b.jpg' },
-            { id: '10', name: 'KEVLAR', category: 'jadi', qty: 93, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19515_b.jpg' },
-            { id: '11', name: 'ANGGUR MERAH', category: 'jadi', qty: 8, unit: 'Botol', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/1669_b.jpg' },
-            { id: '12', name: 'BEER', category: 'jadi', qty: 4, unit: 'Botol', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/19824_b.jpg' },
-            { id: '13', name: 'DESERT EAGLE ', category: 'persenjataan', qty: 306, unit: 'Pcs', image: 'https://dev.prineside.com/en/gtasa_samp_model_id/model/348-desert_eagle/' },
-            { id: '14', name: 'AK47', category: 'persenjataan', qty: 200, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/355_b.jpg' },
-            { id: '15', name: 'SHOTGUN', category: 'persenjataan', qty: 390, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/349_b.jpg' },
-            { id: '16', name: 'TEC 9', category: 'persenjataan', qty: 30, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/347_b.jpg' },
-            { id: '17', name: 'SILENCED', category: 'persenjataan', qty: 0, unit: 'Pcs', image: 'https://files.prineside.com/gtasa_samp_model_id/blue/349_b.jpg' },
-            { id: '18', name: 'Emas Batangan Safe Reserve', category: 'brankas', qty: 500, unit: 'Gram', image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&auto=format&fit=crop&q=60' }
-        ];
-
-        // High Rank Users list (Full Control)
-        const highRankUsers = ['presiden', 'president', 'vicepresident', 'roadcaptain', 'enforcer', 'secretary', 'treasurer', 'maslannn'];
-
-        // App State
-        let activeTab = 'mentah';
-        let stockActionType = 'IN'; // 'IN' or 'OUT'
-        let currentUser = localStorage.getItem('biker_user') || null;
-        let currentUserRole = localStorage.getItem('biker_user_role') || 'MEMBER'; // 'HIGH_RANK' or 'MEMBER'
-        let webhookUrl = localStorage.getItem('biker_webhook') || 'https://discord.com/api/webhooks/1536094807557152869/YIGzQRhwc-xD-Y-UTEej1LR6PiXOjICRUmXYMbfn6UXB2aLHh9qze0rsq693eOl1lVTJ';
-        
-        let registeredUsers = JSON.parse(localStorage.getItem('biker_registered_users')) || [
-            'presiden', 'president', 'vicepresident', 'roadcaptain', 'enforcer', 'secretary', 'treasurer', 'prospect', 'member', 'maslannn'
-        ];
-        
-        let items = JSON.parse(localStorage.getItem('biker_items')) || defaultItems;
-        let logs = JSON.parse(localStorage.getItem('biker_logs')) || [];
-        let cashlogs = JSON.parse(localStorage.getItem('biker_cashlogs')) || [];
-        let vaultCash = parseInt(localStorage.getItem('biker_vault_cash')) || 23395055;
-        let redCash = parseInt(localStorage.getItem('biker_red_cash')) || 200000;
-        let pendingWebhookLogs = JSON.parse(localStorage.getItem('biker_pending_webhooks')) || [];
-
-        function closeSplash() {
-            const splash = document.getElementById('splashScreen');
-            if (splash) {
-                splash.classList.add('opacity-0');
-                setTimeout(() => {
-                    splash.classList.add('hidden');
-                    checkAuth();
-                }, 400);
-            }
-        }
-
-        function showErrorModal(msg) {
-            const modal = document.getElementById('errorModal');
-            const msgEl = document.getElementById('errorMessage');
-            if (msgEl) msgEl.textContent = msg;
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function closeErrorModal() {
-            const modal = document.getElementById('errorModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function openSidebar() {
-            const backdrop = document.getElementById('sidebarBackdrop');
-            const drawer = document.getElementById('sidebarDrawer');
-            if (backdrop) {
-                backdrop.classList.remove('opacity-0', 'pointer-events-none');
-                backdrop.classList.add('opacity-100', 'pointer-events-auto');
-            }
-            if (drawer) drawer.classList.remove('-translate-x-full');
-        }
-
-        function closeSidebar() {
-            const backdrop = document.getElementById('sidebarBackdrop');
-            const drawer = document.getElementById('sidebarDrawer');
-            if (backdrop) {
-                backdrop.classList.remove('opacity-100', 'pointer-events-auto');
-                backdrop.classList.add('opacity-0', 'pointer-events-none');
-            }
-            if (drawer) drawer.classList.add('-translate-x-full');
-        }
-
-        function closeItemModal() {
-            const modal = document.getElementById('itemModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function closeStockModal() {
-            const modal = document.getElementById('stockModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function setStockActionType(type) {
-            stockActionType = type;
-            const inBtn = document.getElementById('stockActionInBtn');
-            const outBtn = document.getElementById('stockActionOutBtn');
-            
-            if (type === 'IN') {
-                if (inBtn) inBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition bg-emerald-600 text-white";
-                if (outBtn) outBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition text-slate-400 hover:text-white";
-            } else {
-                if (inBtn) inBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition text-slate-400 hover:text-white";
-                if (outBtn) outBtn.className = "py-2 rounded-md font-bold text-xs uppercase tracking-wider transition bg-red-600 text-white";
-            }
-        }
-
-        function switchTab(tab) {
-            const titles = {
-                mentah: 'BARANG MENTAH',
-                jadi: 'BARANG JADI',
-                persenjataan: 'PERSENJATAAN',
-                brankas: 'BRANKAS ASSET',
-                keuangan: 'KEUANGAN & KAS'
-            };
-
-            const targetTitle = titles[tab] || 'INVENTARIS';
-
-            // Menampilkan loader visual saat berpindah menu
-            showLoader('MEMUAT MENU...', `Mengakses database ${targetTitle}...`, 350, () => {
-                activeTab = tab;
-                const titleEl = document.getElementById('activeSectionTitle');
-                if (titleEl) titleEl.textContent = targetTitle;
-
-                const tabs = ['mentah', 'jadi', 'persenjataan', 'brankas', 'keuangan'];
-                tabs.forEach(t => {
-                    const navBtn = document.getElementById(`nav-${t}`);
-                    if (navBtn) {
-                        if (t === tab) {
-                            navBtn.className = "nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-white bg-red-600";
-                        } else {
-                            navBtn.className = "nav-item-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-sm font-semibold transition text-slate-400 hover:bg-slate-800/60 hover:text-white";
-                        }
-                    }
-                });
-
-                closeSidebar();
-                renderAll();
-            });
-        }
-
-        function handleLogoUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const dataUrl = evt.target.result;
-                localStorage.setItem('biker_logo', dataUrl);
-                updateLogoImages(dataUrl);
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function updateLogoImages(url) {
-            ['splashLogo', 'sidebarLogo', 'appBarLogo'].forEach(id => {
-                const img = document.getElementById(id);
-                if (img) img.src = url;
-            });
-        }
-
-        function handleImageFileSelect(e, inputId, previewImgId, labelId) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const labelEl = document.getElementById(labelId);
-            if (labelEl) labelEl.textContent = file.name;
-
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const dataUrl = evt.target.result;
-                const inputEl = document.getElementById(inputId);
-                const previewImg = document.getElementById(previewImgId);
-                const container = document.getElementById(previewImgId + 'Container');
-
-                if (inputEl) inputEl.value = dataUrl;
-                if (previewImg) previewImg.src = dataUrl;
-                if (container) container.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function clearImageSelect(inputId, previewContainerId, fileInputId, labelId) {
-            const inputEl = document.getElementById(inputId);
-            const fileInputEl = document.getElementById(fileInputId);
-            const container = document.getElementById(previewContainerId);
-            const labelEl = document.getElementById(labelId);
-
-            if (inputEl) inputEl.value = '';
-            if (fileInputEl) fileInputEl.value = '';
-            if (container) container.classList.add('hidden');
-            if (labelEl) labelEl.textContent = 'Pilih Foto dari Perangkat...';
-        }
-
-        function showLoader(title, subtext, duration = 500, callback = null) {
-            const overlay = document.getElementById('actionLoadingOverlay');
-            const titleEl = document.getElementById('actionLoadingTitle');
-            const subtextEl = document.getElementById('actionLoadingSubtext');
-            const progressBar = document.getElementById('actionProgressBar');
-
-            if (titleEl) titleEl.textContent = title;
-            if (subtextEl) subtextEl.textContent = subtext;
-            if (progressBar) progressBar.style.width = '0%';
-            if (overlay) overlay.classList.remove('hidden');
-
-            setTimeout(() => {
-                if (progressBar) progressBar.style.width = '100%';
-            }, 50);
-
-            if (duration > 0) {
-                setTimeout(() => {
-                    hideLoader();
-                    if (typeof callback === 'function') callback();
-                }, duration);
-            } else if (typeof callback === 'function') {
-                callback();
-            }
-        }
-
-        function hideLoader() {
-            const overlay = document.getElementById('actionLoadingOverlay');
-            if (overlay) overlay.classList.add('hidden');
-        }
-
-        function addLog(action, detail, proof = '') {
-            const logItem = {
-                action,
-                detail,
-                proof,
-                user: currentUser || 'System',
-                timestamp: new Date().toLocaleString('id-ID')
-            };
-            logs.unshift(logItem);
-            localStorage.setItem('biker_logs', JSON.stringify(logs));
-            renderLogs();
-        }
-
-        function renderLogs() {
-            const container = document.getElementById('activityLogs');
-            if (!container) return;
-
-            if (logs.length === 0) {
-                container.innerHTML = `<p class="text-slate-500 italic">Belum ada riwayat aktivitas.</p>`;
-                return;
-            }
-
-            container.innerHTML = logs.map(l => `
-                <div class="p-2 bg-slate-900/80 rounded border border-slate-800 flex items-start justify-between gap-2">
-                    <div>
-                        <div class="flex items-center gap-2 mb-0.5">
-                            <span class="font-bold text-red-500 uppercase">[${l.action}]</span>
-                            <span class="text-[10px] text-amber-500 font-semibold">${l.user || 'System'}</span>
-                        </div>
-                        <p class="text-slate-300 text-xs">${l.detail}</p>
-                        ${l.proof ? `<a href="${l.proof}" target="_blank" class="text-[10px] text-indigo-400 hover:underline flex items-center gap-1 mt-1"><i class="fa-solid fa-image"></i> Lihat Bukti Foto</a>` : ''}
-                    </div>
-                    <span class="text-[10px] text-slate-500 font-mono whitespace-nowrap">${l.timestamp}</span>
-                </div>
-            `).join('');
-        }
-
-        function renderCashLogs() {
-            const container = document.getElementById('cashflowLogs');
-            if (!container) return;
-
-            if (cashlogs.length === 0) {
-                container.innerHTML = `<p class="text-slate-500 italic text-xs p-3 text-center">Belum ada riwayat transaksi kas.</p>`;
-                return;
-            }
-
-            container.innerHTML = cashlogs.map(c => {
-                const isIn = c.type === 'IN';
-                const badgeColor = isIn ? 'text-emerald-400 bg-emerald-950/60 border-emerald-800' : 'text-red-400 bg-red-950/60 border-red-800';
-                return `
-                    <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-800 flex items-center justify-between gap-3">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="px-2 py-0.5 text-[10px] font-bold rounded border ${badgeColor}">
-                                    ${isIn ? '+ MASUK' : '- KELUAR'} (${c.currency})
-                                </span>
-                                <span class="text-xs text-white font-semibold">${c.category}</span>
-                            </div>
-                            <p class="text-xs text-slate-400">${c.notes || 'Tanpa Catatan'}</p>
-                            <div class="flex items-center gap-3 mt-1 text-[10px] text-slate-500">
-                                <span><i class="fa-solid fa-user mr-1"></i>${c.user || 'System'}</span>
-                                <span><i class="fa-solid fa-clock mr-1"></i>${c.timestamp}</span>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="font-mono font-bold text-sm ${isIn ? 'text-emerald-400' : 'text-red-400'}">
-                                ${isIn ? '+' : '-'} Rp ${parseInt(c.amount).toLocaleString('id-ID')}
-                            </div>
-                            ${c.proof ? `<a href="${c.proof}" target="_blank" class="text-[10px] text-amber-400 hover:underline flex items-center justify-end gap-1 mt-1"><i class="fa-solid fa-receipt"></i> Struk</a>` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderStats() {
-            const statVault = document.getElementById('statVault');
-            const statRedVault = document.getElementById('statRedVault');
-            const statWeapons = document.getElementById('statWeapons');
-            const statRaw = document.getElementById('statRaw');
-            const statFinished = document.getElementById('statFinished');
-
-            if (statVault) statVault.textContent = `Rp ${vaultCash.toLocaleString('id-ID')}`;
-            if (statRedVault) statRedVault.textContent = `Rp ${redCash.toLocaleString('id-ID')}`;
-
-            const totalWeapons = items.filter(i => i.category === 'persenjataan').reduce((acc, curr) => acc + (parseInt(curr.qty) || 0), 0);
-            const totalRaw = items.filter(i => i.category === 'mentah').reduce((acc, curr) => acc + (parseInt(curr.qty) || 0), 0);
-            const totalFinished = items.filter(i => i.category === 'jadi').reduce((acc, curr) => acc + (parseInt(curr.qty) || 0), 0);
-
-            if (statWeapons) statWeapons.textContent = `${totalWeapons} Item`;
-            if (statRaw) statRaw.textContent = `${totalRaw} Stok`;
-            if (statFinished) statFinished.textContent = `${totalFinished} Stok`;
-        }
-
-        function updatePendingWebhookUI() {
-            const badge = document.getElementById('pendingCountBadge');
-            const btn = document.getElementById('sendPendingWebhookBtn');
-            if (badge) badge.textContent = pendingWebhookLogs.length;
-            if (btn) {
-                if (pendingWebhookLogs.length > 0) {
-                    btn.classList.remove('hidden');
-                } else {
-                    btn.classList.add('hidden');
-                }
-            }
-        }
-
-        function saveItems() {
-            localStorage.setItem('biker_items', JSON.stringify(items));
-            renderAll();
-        }
-
-        function renderAll() {
-            renderStats();
-            renderInventory();
-            renderCashLogs();
-            renderLogs();
-            updatePendingWebhookUI();
-        }
-
-        // Initialize saved custom logo if existing
-        const savedLogo = localStorage.getItem('biker_logo');
-        if (savedLogo) {
-            updateLogoImages(savedLogo);
-        }
-
-        function checkAuth() {
-            const mainContent = document.getElementById('mainContent');
-            const loginScreen = document.getElementById('loginScreen');
-
-            if (currentUser) {
-                if (loginScreen) loginScreen.classList.add('hidden');
-                if (mainContent) mainContent.classList.remove('hidden');
-                
-                const isHighRank = currentUserRole === 'HIGH_RANK';
-                const userBadge = document.getElementById('userBadgeSidebar');
-                if (userBadge) {
-                    userBadge.textContent = `${currentUser.toUpperCase()} • ${isHighRank ? 'HIGH RANK' : 'MEMBER (READ ONLY)'}`;
-                    userBadge.className = isHighRank ? "text-[10px] text-red-500 font-bold block" : "text-[10px] text-amber-500 font-mono block";
-                }
-
-                // Apply UI permissions based on Role
-                applyRolePermissions();
-                renderAll();
-            } else {
-                if (mainContent) mainContent.classList.add('hidden');
-                if (loginScreen) loginScreen.classList.remove('hidden');
-            }
-        }
-
-        function applyRolePermissions() {
-            const isHighRank = currentUserRole === 'HIGH_RANK';
-
-            // Nav Add Item Btn
-            const navAddItemBtn = document.getElementById('navAddItemBtn');
-            if (navAddItemBtn) {
-                if (isHighRank) {
-                    navAddItemBtn.classList.remove('hidden');
-                } else {
-                    navAddItemBtn.classList.add('hidden');
-                }
-            }
-
-            // Header Add Btn
-            const headerAddBtn = document.getElementById('headerAddBtn');
-            if (headerAddBtn) {
-                if (isHighRank) {
-                    headerAddBtn.classList.remove('hidden');
-                } else {
-                    headerAddBtn.classList.add('hidden');
-                }
-            }
-
-            // Cashflow Form vs ReadOnly Notice
-            const cashFormContainer = document.getElementById('cashFormContainer');
-            const cashReadOnlyNotice = document.getElementById('cashReadOnlyNotice');
-            const clearCashBtn = document.getElementById('clearCashBtn');
-
-            if (cashFormContainer && cashReadOnlyNotice) {
-                if (isHighRank) {
-                    cashFormContainer.classList.remove('hidden');
-                    cashReadOnlyNotice.classList.add('hidden');
-                    if (clearCashBtn) clearCashBtn.classList.remove('hidden');
-                } else {
-                    cashFormContainer.classList.add('hidden');
-                    cashReadOnlyNotice.classList.remove('hidden');
-                    if (clearCashBtn) clearCashBtn.classList.add('hidden');
-                }
-            }
-        }
-
-        function togglePasswordVisibilityByRole() {
-            const selectEl = document.getElementById('loginUserSelect');
-            const customUserContainer = document.getElementById('customUserContainer');
-            const passContainer = document.getElementById('loginPassContainer');
-            if (!selectEl || !passContainer) return;
-
-            const val = selectEl.value;
-
-            // Toggle custom input container
-            if (val === 'CUSTOM') {
-                if (customUserContainer) customUserContainer.classList.remove('hidden');
-            } else {
-                if (customUserContainer) customUserContainer.classList.add('hidden');
-            }
-
-            // Check if selected role is high rank or custom
-            if (highRankUsers.includes(val) || val === 'CUSTOM') {
-                passContainer.classList.remove('hidden');
-            } else {
-                // Member / Prospect: Hide password field completely
-                passContainer.classList.add('hidden');
-            }
-        }
-
-        function openHighRankPasswordModal() {
-            const modal = document.getElementById('highRankPassModal');
-            const passInput = document.getElementById('quickHighRankPass');
-            if (passInput) passInput.value = '';
-            if (modal) modal.classList.remove('hidden');
-            setTimeout(() => { if (passInput) passInput.focus(); }, 100);
-        }
-
-        function closeHighRankPassModal() {
-            const modal = document.getElementById('highRankPassModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function handleQuickHighRankAuth(e) {
-            e.preventDefault();
-            const passInput = document.getElementById('quickHighRankPass');
-            const roleSelect = document.getElementById('quickHighRankRole');
-            const pass = passInput ? passInput.value.trim() : '';
-            const role = roleSelect ? roleSelect.value : 'Presiden';
-
-            if (pass === '123456') {
-                closeHighRankPassModal();
-                quickAccessLogin(role, 'HIGH_RANK');
-            } else {
-                closeHighRankPassModal();
-                showErrorModal('Password High Rank yang Anda masukkan salah!');
-            }
-        }
-
-        function quickAccessLogin(username, role = 'MEMBER') {
-            showLoader("MENGOTENTIKASI...", `Akses Cepat ${username}...`, 500, () => {
-                currentUser = username;
-                currentUserRole = role;
-
-                localStorage.setItem('biker_user', currentUser);
-                localStorage.setItem('biker_user_role', currentUserRole);
-
-                checkAuth();
-                addLog('LOGIN SYSTEM', `[${currentUserRole}] ${username} berhasil masuk ke repository (Akses Cepat).`);
-            });
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const selectEl = document.getElementById('loginUserSelect');
-            let user = selectEl ? selectEl.value : 'member';
-
-            if (user === 'CUSTOM') {
-                user = document.getElementById('loginUserCustom').value.trim();
-            }
-
-            if (!user) {
-                showErrorModal('Silakan pilih atau ketik username/callsign Anda!');
-                return;
-            }
-
-            const userLower = user.toLowerCase();
-            const isHighRankRole = highRankUsers.includes(userLower);
-
-            // If selected role is Member/Prospect, bypass password
-            if (!isHighRankRole && userLower !== 'custom') {
-                quickAccessLogin(user.toUpperCase(), 'MEMBER');
-                return;
-            }
-
-            // Otherwise check password for Officer / Custom input
-            const pass = document.getElementById('loginPass').value.trim();
-
-            showLoader("MENGOTENTIKASI...", "Memeriksa Kredensial Club...", 600, () => {
-                const isUserRegistered = registeredUsers.some(u => u.toLowerCase() === userLower);
-                
-                if (!isUserRegistered && userLower !== 'custom') {
-                    showErrorModal(`Username "${user}" tidak terdaftar dalam database klub! Silakan gunakan Callsign / Username resmi yang terdaftar.`);
-                    return;
-                }
-
-                if (pass === '123456') {
-                    currentUser = user;
-                    // Determine Role
-                    if (isHighRankRole) {
-                        currentUserRole = 'HIGH_RANK';
-                    } else {
-                        currentUserRole = 'MEMBER';
-                    }
-
-                    localStorage.setItem('biker_user', currentUser);
-                    localStorage.setItem('biker_user_role', currentUserRole);
-
-                    checkAuth();
-                    addLog('LOGIN SYSTEM', `[${currentUserRole}] Member ${user} berhasil masuk ke repository.`);
-                } else {
-                    showErrorModal('Password High Rank yang Anda masukkan salah! Gunakan password resmi.');
-                }
-            });
-        }
-
-        function logout() {
-            showLoader("LOGOUT...", "Keluar dari sistem...", 400, () => {
-                currentUser = null;
-                currentUserRole = 'MEMBER';
-                localStorage.removeItem('biker_user');
-                localStorage.removeItem('biker_user_role');
-                closeSidebar();
-                checkAuth();
-            });
-        }
-
-        function renderInventory() {
-            const container = document.getElementById('inventoryContainer');
-            const keuanganContainer = document.getElementById('keuanganContainer');
-            if (!container) return;
-
-            if (activeTab === 'keuangan') {
-                container.classList.add('hidden');
-                if (keuanganContainer) keuanganContainer.classList.remove('hidden');
-                return;
-            }
-
-            container.classList.remove('hidden');
-            if (keuanganContainer) keuanganContainer.classList.add('hidden');
-
-            const filteredItems = items.filter(i => i.category === activeTab);
-            container.innerHTML = '';
-
-            const isHighRank = currentUserRole === 'HIGH_RANK';
-
-            if (filteredItems.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-12 bg-biker-card border border-biker-border rounded-xl p-6">
-                        <i class="fa-solid fa-box-open text-4xl text-slate-600 mb-2"></i>
-                        <p class="text-sm text-slate-400">Belum ada data barang untuk kategori ini.</p>
-                        ${isHighRank ? `
-                            <button onclick="openAddItemModal()" class="mt-3 bg-red-600 text-white text-xs px-4 py-2 rounded-lg uppercase tracking-wider font-bold">
-                                + Tambah Barang Pertama
-                            </button>
-                        ` : ''}
-                    </div>
-                `;
-                return;
-            }
-
-            filteredItems.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "bg-biker-card border border-biker-border rounded-xl p-4 flex flex-col justify-between hover:border-red-900/60 transition shadow-lg relative group";
-                
-                const actionControlsHTML = isHighRank ? `
-                    <div class="space-y-2 pt-2 border-t border-slate-800">
-                        <div class="grid grid-cols-2 gap-1.5">
-                            <button onclick="quickStockAdjust('${item.id}', 1)" class="bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 py-1.5 rounded text-xs font-bold transition flex items-center justify-center gap-1">
-                                <i class="fa-solid fa-plus text-[10px]"></i> 1
-                            </button>
-                            <button onclick="quickStockAdjust('${item.id}', -1)" class="bg-red-950/80 hover:bg-red-900 border border-red-800 text-red-400 py-1.5 rounded text-xs font-bold transition flex items-center justify-center gap-1">
-                                <i class="fa-solid fa-minus text-[10px]"></i> 1
-                            </button>
-                        </div>
-
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="openStockModal('${item.id}', 'IN')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-1.5 rounded text-xs font-bold transition uppercase tracking-wider">
-                                Adjust Stok
-                            </button>
-                            <button onclick="openEditItemModal('${item.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded transition" title="Edit Item">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
-                            <button onclick="deleteItem('${item.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-red-400 rounded transition" title="Hapus Item">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                ` : `
-                    <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-                        <span>Status: Read Only</span>
-                        <span class="bg-slate-900 px-2 py-0.5 rounded text-amber-500 border border-slate-800">Member Mode</span>
-                    </div>
-                `;
-
-                card.innerHTML = `
-                    <div>
-                        <div class="relative w-full h-36 bg-slate-900 rounded-lg overflow-hidden mb-3 border border-slate-800">
-                            <img src="${item.image || 'https://placehold.co/400x300/1e293b/ffffff?text=NO+IMAGE'}" 
-                                 alt="${item.name}" 
-                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                                 onerror="this.src='https://placehold.co/400x300/1e293b/ffffff?text=NO+IMAGE'">
-                            <span class="absolute top-2 right-2 bg-black/75 backdrop-blur text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded border border-slate-700 uppercase">
-                                ${item.unit}
-                            </span>
-                        </div>
-                        <h4 class="font-bikerTitle text-lg text-white tracking-wider leading-tight uppercase mb-1">${item.name}</h4>
-                        <div class="flex items-baseline gap-2 mb-3">
-                            <span class="text-2xl font-bold font-mono text-red-500">${item.qty}</span>
-                            <span class="text-xs text-slate-400 font-mono">${item.unit} Tersedia</span>
-                        </div>
-                    </div>
-                    ${actionControlsHTML}
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function quickStockAdjust(id, delta) {
-            if (currentUserRole !== 'HIGH_RANK') {
-                showErrorModal('AKSES DITOLAK! Akun Member hanya memiliki hak akses READ ONLY.');
-                return;
-            }
-            const item = items.find(i => i.id === id);
-            if (!item) return;
-
-            if (delta < 0 && item.qty + delta < 0) {
-                showErrorModal(`Stok "${item.name}" sudah 0! Tidak bisa dikurangi.`);
-                return;
-            }
-
-            item.qty += delta;
-            saveItems();
-
-            const actionLabel = delta > 0 ? 'BARANG MASUK (+)' : 'BARANG KELUAR (-)';
-            addLog(actionLabel, `${item.name}: ${delta > 0 ? '+' : ''}${delta} ${item.unit}`);
-            
-            queueWebhookNotification(`📋 **Quick Update Stok**\n**Action:** ${actionLabel}\n**Item:** ${item.name}\n**Jumlah:** ${delta > 0 ? '+' : ''}${delta} ${item.unit}\n**Sisa Stok:** ${item.qty} ${item.unit}\n**User:** ${currentUser || 'System'}`);
-        }
-
-        function openAddItemModal() {
-            if (currentUserRole !== 'HIGH_RANK') {
-                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat menambah item.');
-                return;
-            }
-            const modal = document.getElementById('itemModal');
-            const form = document.getElementById('itemForm');
-            const title = document.getElementById('modalTitle');
-            if (form) form.reset();
-            const itemId = document.getElementById('itemId');
-            if (itemId) itemId.value = '';
-            if (title) title.textContent = 'TAMBAH ITEM BARU';
-            clearImageSelect('itemImage', 'itemImagePreviewContainer', 'itemFileInput', 'itemFileLabel');
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function openEditItemModal(id) {
-            if (currentUserRole !== 'HIGH_RANK') {
-                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat mengubah data item.');
-                return;
-            }
-            const item = items.find(i => i.id === id);
-            if (!item) return;
-
-            const modal = document.getElementById('itemModal');
-            const title = document.getElementById('modalTitle');
-            
-            document.getElementById('itemId').value = item.id;
-            document.getElementById('itemName').value = item.name;
-            document.getElementById('itemCategory').value = item.category;
-            document.getElementById('itemQty').value = item.qty;
-            document.getElementById('itemUnit').value = item.unit;
-            document.getElementById('itemImage').value = item.image || '';
-
-            if (item.image) {
-                const previewImg = document.getElementById('itemImagePreview');
-                const container = document.getElementById('itemImagePreviewContainer');
-                if (previewImg) previewImg.src = item.image;
-                if (container) container.classList.remove('hidden');
-            } else {
-                clearImageSelect('itemImage', 'itemImagePreviewContainer', 'itemFileInput', 'itemFileLabel');
-            }
-
-            if (title) title.textContent = 'EDIT DATA ITEM';
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function saveItem(e) {
-            e.preventDefault();
-            if (currentUserRole !== 'HIGH_RANK') {
-                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat menyimpan data item.');
-                return;
-            }
-            const id = document.getElementById('itemId').value || Date.now().toString();
-            const name = document.getElementById('itemName').value.trim();
-            const category = document.getElementById('itemCategory').value;
-            const qty = parseInt(document.getElementById('itemQty').value) || 0;
-            const unit = document.getElementById('itemUnit').value.trim() || 'Pcs';
-            const image = document.getElementById('itemImage').value.trim();
-
-            showLoader('MENYIMPAN DATA...', `Menyimpan item ${name}...`, 400, () => {
-                const existingIndex = items.findIndex(i => i.id === id);
-                if (existingIndex > -1) {
-                    items[existingIndex] = { id, name, category, qty, unit, image };
-                    addLog('EDIT ITEM', `Pembaruan data item ${name}`);
-                } else {
-                    items.push({ id, name, category, qty, unit, image });
-                    addLog('TAMBAH ITEM', `Menambahkan item baru ${name} (${qty} ${unit})`);
-                }
-
-                saveItems();
-                closeItemModal();
-                queueWebhookNotification(`📦 **Barang Ditambahkan/Diperbarui**\n**Nama:** ${name}\n**Stok:** ${qty} ${unit}\n**Oleh:** ${currentUser || 'System'}`);
-            });
-        }
-
-        function deleteItem(id) {
-            if (currentUserRole !== 'HIGH_RANK') {
-                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat menghapus item.');
-                return;
-            }
-            const item = items.find(i => i.id === id);
-            if (!item) return;
-
-            if (confirm(`Apakah Anda yakin ingin menghapus item "${item.name}"?`)) {
-                showLoader('MENGHAPUS ITEM...', `Menghapus ${item.name}...`, 300, () => {
-                    items = items.filter(i => i.id !== id);
-                    saveItems();
-                    addLog('HAPUS ITEM', `Menghapus item ${item.name}`);
-                    queueWebhookNotification(`🗑️ **Barang Dihapus**\n**Nama:** ${item.name}\n**Oleh:** ${currentUser || 'System'}`);
-                });
-            }
-        }
-
-        function openStockModal(id, actionType = 'IN') {
-            if (currentUserRole !== 'HIGH_RANK') {
-                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat mengubah stok.');
-                return;
-            }
-            const item = items.find(i => i.id === id);
-            if (!item) return;
-
-            stockActionType = actionType;
-            document.getElementById('stockModalItemId').value = item.id;
-            document.getElementById('stockModalItemInfo').textContent = `${item.name} • Sisa Stok: ${item.qty} ${item.unit}`;
-            document.getElementById('stockModalAmount').value = 1;
-            document.getElementById('stockModalNotes').value = '';
-            clearImageSelect('stockProofImage', 'stockProofPreviewContainer', 'stockFileInput', 'stockFileLabel');
-
-            setStockActionType(actionType);
-            const modal = document.getElementById('stockModal');
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function confirmStockChange() {
-            if (currentUserRole !== 'HIGH_RANK') {
-                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat mengonfirmasi stok.');
-                return;
-            }
-            const id = document.getElementById('stockModalItemId').value;
-            const amount = parseInt(document.getElementById('stockModalAmount').value) || 0;
-            const notes = document.getElementById('stockModalNotes').value.trim() || 'Tanpa catatan';
-            const proof = document.getElementById('stockProofImage') ? document.getElementById('stockProofImage').value.trim() : '';
-            const item = items.find(i => i.id === id);
-
-            if (!item || amount <= 0) return;
-
-            if (stockActionType === 'OUT' && item.qty < amount) {
-                showErrorModal(`Stok "${item.name}" tidak mencukupi! Sisa stok saat ini: ${item.qty} ${item.unit}.`);
-                return;
-            }
-
-            showLoader('MENGUPDATE STOK...', `Memproses transaksi stok ${item.name}...`, 400, () => {
-                if (stockActionType === 'IN') {
-                    item.qty += amount;
-                } else {
-                    item.qty -= amount;
-                }
-
-                saveItems();
-                closeStockModal();
-
-                const actionLabel = stockActionType === 'IN' ? 'BARANG MASUK (+)' : 'BARANG KELUAR (-)';
-                addLog(actionLabel, `${item.name}: ${amount} ${item.unit}. Ket: ${notes}`, proof);
-                
-                queueWebhookNotification(`📋 **Laporan Keluar/Masuk Barang**\n**Status:** ${actionLabel}\n**Item:** ${item.name}\n**Jumlah:** ${amount} ${item.unit}\n**Stok Sekarang:** ${item.qty} ${item.unit}\n**Catatan:** ${notes}\n**PJ/User:** ${currentUser || 'System'}`, proof);
-            });
-        }
-
-        function addCashflow(e) {
-            e.preventDefault();
-            if (currentUserRole !== 'HIGH_RANK') {
-                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat mencatat transaksi kas.');
-                return;
-            }
-            const currency = document.getElementById('cashCurrency').value;
-            const type = document.getElementById('cashType').value;
-            const category = document.getElementById('cashCategory').value;
-            const amount = parseInt(document.getElementById('cashAmount').value) || 0;
-            const proof = document.getElementById('cashProofImage').value.trim();
-            const notes = document.getElementById('cashNotes').value.trim();
-
-            if (amount <= 0) {
-                showErrorModal('Masukkan nominal uang yang valid!');
-                return;
-            }
-
-            if (type === 'OUT') {
-                if (currency === 'CLEAN' && vaultCash < amount) {
-                    showErrorModal('Saldo Brankas Uang Clean tidak mencukupi!');
-                    return;
-                }
-                if (currency === 'RED' && redCash < amount) {
-                    showErrorModal('Saldo Kas Uang Merah tidak mencukupi!');
-                    return;
-                }
-            }
-
-            showLoader('PENCATATAN KAS...', 'Menyimpan transaksi keuangan...', 400, () => {
-                if (currency === 'CLEAN') {
-                    vaultCash = type === 'IN' ? vaultCash + amount : vaultCash - amount;
-                    localStorage.setItem('biker_vault_cash', vaultCash);
-                } else {
-                    redCash = type === 'IN' ? redCash + amount : redCash - amount;
-                    localStorage.setItem('biker_red_cash', redCash);
-                }
-
-                const timestamp = new Date().toLocaleString('id-ID');
-                const logEntry = { currency, type, category, amount, proof, notes, timestamp, user: currentUser || 'System' };
-                cashlogs.unshift(logEntry);
-                localStorage.setItem('biker_cashlogs', JSON.stringify(cashlogs));
-
-                document.getElementById('cashAmount').value = '';
-                document.getElementById('cashNotes').value = '';
-                clearImageSelect('cashProofImage', 'cashProofPreviewContainer', 'cashFileInput', 'cashFileLabel');
-
-                renderAll();
-
-                const actionLabel = `KAS ${currency} (${type === 'IN' ? 'MASUK' : 'KELUAR'})`;
-                addLog(actionLabel, `${category}: Rp ${amount.toLocaleString('id-ID')}`);
-
-                queueWebhookNotification(`💵 **Laporan Kas Keuangan**\n**Kategori Kas:** ${currency === 'CLEAN' ? 'Uang Clean' : 'Uang Merah'}\n**Tipe:** ${type === 'IN' ? 'Pemasukan (+)' : 'Pengeluaran (-)'}\n**Keperluan:** ${category}\n**Jumlah:** Rp ${amount.toLocaleString('id-ID')}\n**Catatan:** ${notes || '-'}\n**PJ/User:** ${currentUser || 'System'}`, proof);
-            });
-        }
-
-        function clearCashLogs() {
-            if (currentUserRole !== 'HIGH_RANK') {
-                showErrorModal('AKSES DITOLAK! Hanya High Rank yang dapat mereset log kas.');
-                return;
-            }
-            if (confirm('Bersihkan seluruh catatan riwayat kas?')) {
-                cashlogs = [];
-                localStorage.removeItem('biker_cashlogs');
-                renderAll();
-                addLog('RESET KAS LOG', 'Riwayat catatan kas telah direset.');
-            }
-        }
-
-        function dataURItoBlob(dataURI) {
-            const byteString = atob(dataURI.split(',')[1]);
-            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-            return new Blob([ab], { type: mimeString });
-        }
-
-        function executeDiscordSend(payload, proofImage = null, successCallback = null) {
-            if (!webhookUrl) {
-                showErrorModal('Discord Webhook URL belum diisi! Silakan isi URL Webhook di menu Pengaturan.');
-                return;
-            }
-
-            let fetchOptions = {};
-
-            if (proofImage && proofImage.startsWith('data:image/')) {
-                try {
-                    const blob = dataURItoBlob(proofImage);
-                    const formData = new FormData();
-                    formData.append('files[0]', blob, 'bukti_foto.png');
-                    
-                    if (payload.embeds && payload.embeds.length > 0) {
-                        payload.embeds[0].image = { url: 'attachment://bukti_foto.png' };
-                    }
-                    
-                    formData.append('payload_json', JSON.stringify(payload));
-                    fetchOptions = {
-                        method: 'POST',
-                        body: formData
-                    };
-                } catch (e) {
-                    console.error('Error attaching image:', e);
-                    fetchOptions = {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    };
-                }
-            } else {
-                if (proofImage && (proofImage.startsWith('http://') || proofImage.startsWith('https://'))) {
-                    if (payload.embeds && payload.embeds.length > 0) {
-                        payload.embeds[0].image = { url: proofImage };
-                    }
-                }
-                fetchOptions = {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                };
-            }
-
-            fetch(webhookUrl, fetchOptions)
-            .then(res => {
-                if (res.ok || res.status === 204) {
-                    if (typeof successCallback === 'function') successCallback();
-                } else {
-                    showErrorModal(`Gagal membroadcast ke Discord! HTTP Status ${res.status}`);
-                }
-            })
-            .catch(() => {
-                showErrorModal('Terjadi kesalahan jaringan saat berusaha menghubungi Discord Webhook.');
-            });
-        }
-
-        function queueWebhookNotification(text, proof = null) {
-            const timestamp = new Date().toLocaleTimeString('id-ID');
-            pendingWebhookLogs.push({ text, proof, timestamp });
-            localStorage.setItem('biker_pending_webhooks', JSON.stringify(pendingWebhookLogs));
-            updatePendingWebhookUI();
-
-            const isAutoSend = document.getElementById('autoWebhookToggle') ? document.getElementById('autoWebhookToggle').checked : true;
-            
-            if (isAutoSend && webhookUrl) {
-                const itemProof = proof;
-                const payload = {
-                    username: "WESGATH MC BOT",
-                    avatar_url: "https://i.imgur.com/xdrO148.png",
-                    embeds: [{
-                        title: "🏍️ WESGATH MC - NOTIFIKASI BARU",
-                        description: text + (itemProof ? `\n📷 **Bukti Foto:** Terlampir` : ''),
-                        color: 14423100,
-                        footer: {
-                            text: "WESGATH MC Management • " + new Date().toLocaleString('id-ID')
-                        }
-                    }]
-                };
-
-                executeDiscordSend(payload, itemProof, () => {
-                    pendingWebhookLogs.pop();
-                    localStorage.setItem('biker_pending_webhooks', JSON.stringify(pendingWebhookLogs));
-                    updatePendingWebhookUI();
-                });
-            }
-        }
-
-        function sendPendingWebhooks() {
-            if (pendingWebhookLogs.length === 0) {
-                showErrorModal('Tidak ada log terpending yang perlu dikirim ke Discord.');
-                return;
-            }
-
-            showLoader('MENGIRIM DISCORD...', 'Mengirim rangkuman log ke Discord Webhook...', 0);
-
-            let combinedMessage = `📋 **RANGKUMAN LOG PERUBAHAN (${pendingWebhookLogs.length} Aktivitas)**\n\n`;
-            let proofToAttach = null;
-
-            pendingWebhookLogs.forEach((item, index) => {
-                combinedMessage += `**[#${index + 1} - ${item.timestamp}]**\n${item.text}\n`;
-                if (item.proof) {
-                    combinedMessage += `📷 **Bukti Foto:** Terlampir\n`;
-                    if (!proofToAttach) proofToAttach = item.proof;
-                }
-                combinedMessage += `───────────────\n`;
-            });
-
-            const payload = {
-                username: "WESGATH MC BOT",
-                avatar_url: "https://i.imgur.com/xdrO148.png",
-                embeds: [{
-                    title: "🏍️ WESGATH MC - BATCH LOG REPORT",
-                    description: combinedMessage.substring(0, 4000),
-                    color: 14423100,
-                    footer: {
-                        text: "Dikirim oleh: " + (currentUser || 'System') + " • " + new Date().toLocaleString('id-ID')
-                    }
-                }]
-            };
-
-            executeDiscordSend(payload, proofToAttach, () => {
-                hideLoader();
-                pendingWebhookLogs = [];
-                localStorage.removeItem('biker_pending_webhooks');
-                updatePendingWebhookUI();
-                showLoader('SUKSES', 'Berhasil mengirim laporan log ke Discord!', 1000);
-            });
-        }
-
-        function sendFullReportWebhook() {
-            showLoader('MENGIRIM LAPORAN...', 'Menyiapkan & mengirim Laporan Total ke Discord...', 0);
-
-            const rawItems = items.filter(i => i.category === 'mentah');
-            const finishedItems = items.filter(i => i.category === 'jadi');
-            const weapons = items.filter(i => i.category === 'persenjataan');
-            const safeAssets = items.filter(i => i.category === 'brankas');
-
-            let reportText = `💵 **KAS & KEUANGAN**\n`;
-            reportText += `• Kas Regular: Rp ${vaultCash.toLocaleString('id-ID')}\n`;
-            reportText += `• Uang Merah: Rp ${redCash.toLocaleString('id-ID')}\n\n`;
-
-            reportText += `📦 **BARANG MENTAH**\n`;
-            if (rawItems.length > 0) {
-                rawItems.forEach(i => { reportText += `• ${i.name}: ${i.qty} ${i.unit}\n`; });
-            } else {
-                reportText += `• Kosong\n`;
-            }
-
-            reportText += `\n📦 **BARANG JADI**\n`;
-            if (finishedItems.length > 0) {
-                finishedItems.forEach(i => { reportText += `• ${i.name}: ${i.qty} ${i.unit}\n`; });
-            } else {
-                reportText += `• Kosong\n`;
-            }
-
-            reportText += `\n🔫 **PERSENJATAAN**\n`;
-            if (weapons.length > 0) {
-                weapons.forEach(i => { reportText += `• ${i.name}: ${i.qty} ${i.unit}\n`; });
-            } else {
-                reportText += `• Kosong\n`;
-            }
-
-            if (safeAssets.length > 0) {
-                reportText += `\n🏦 **BRANKAS VALUABLES**\n`;
-                safeAssets.forEach(i => { reportText += `• ${i.name}: ${i.qty} ${i.unit}\n`; });
-            }
-
-            const payload = {
-                username: "WESGATH MC BOT",
-                avatar_url: "https://i.imgur.com/xdrO148.png",
-                embeds: [{
-                    title: "📊 WESGATH MC - LAPORAN TOTAL INVENTARIS & KAS",
-                    description: reportText.substring(0, 4000),
-                    color: 15158332,
-                    footer: {
-                        text: "Laporan Dibuat Oleh: " + (currentUser || 'System') + " • " + new Date().toLocaleString('id-ID')
-                    }
-                }]
-            };
-
-            executeDiscordSend(payload, null, () => {
-                hideLoader();
-                showLoader('SUKSES', 'Laporan Total berhasil dikirim ke Discord!', 1000);
-            });
-        }
-    </script>
+<body>
+<div id="splash" class="screen"><div><div class="wm"><i>J</i>CORP</div><div class="load"><b></b></div><div>Memuat J CORP Supply</div></div></div>
+<div id="login" class="screen hide"><div class="lcard">
+  <h2>Masuk ke J CORP</h2>
+  <p>Masuk dengan Discord supaya Nama Pemesan terisi otomatis dari username kamu.</p>
+  <button class="btn dc" id="dcLogin">Masuk dengan Discord</button>
+  <div class="demo" id="demo">
+    <label for="dname">Mode demo (tanpa Discord)</label>
+    <input id="dname" placeholder="Ketik username Discord" autocomplete="off">
+    <button class="btn alt wide" id="demoGo" style="margin-top:8px">Masuk mode demo</button>
+  </div>
+  <p class="err" id="lerr"></p>
+</div></div>
+<header><div class="bar">
+  <div class="logo"><i>J</i>CORP</div>
+  <div class="sub">Supplier restock untuk bengkel, restoran, dan badside</div>
+  <div class="who"><span class="av" id="av"></span><span id="who"></span><button class="out" id="logout">Keluar</button></div>
+  <nav>
+    <button data-tab="home" class="on">Beranda</button>
+    <button data-tab="katalog">Order</button>
+    <button data-tab="kirim">Pengiriman</button>
+    <button data-tab="dash">Dashboard</button>
+  </nav>
+</div></header>
+
+<main>
+<section id="home">
+  <div class="hero">
+    <h1>J CORP</h1>
+    <p>Supplier bahan mentah untuk bengkel, restoran, dan bisnis lainnya. Order, kirim, dan pantau semuanya dari satu tempat.</p>
+    <div class="cta"><button class="btn amber" data-tab="katalog">Mulai order</button><button class="btn ghost" data-tab="kirim">Lihat pengiriman</button></div>
+    <div class="live" id="live"></div>
+  </div>
+  <h2 class="sec">Menu utama</h2>
+  <div class="menu">
+    <button class="mi" data-tab="katalog"><span class="em">🛒</span><h3>Order barang</h3><p>Pilih barang, isi keranjang, lalu checkout.</p></button>
+    <button class="mi" data-tab="kirim"><span class="em">🚚</span><h3>Pengiriman</h3><p>Pantau status order dari disiapkan sampai terkirim.</p></button>
+    <button class="mi" data-tab="dash"><span class="em">📊</span><h3>Dashboard</h3><p>Lihat omzet, barang terlaris, dan tujuan favorit.</p></button>
+  </div>
+  <h2 class="sec">Layanan restock</h2>
+  <div class="menu" id="svc"></div>
+  <h2 class="sec">Ketentuan</h2>
+  <div class="panel rules"><ul>
+    <li>Setiap pemesanan dikenakan biaya operasional 20% jika pemesan bukan Company.</li>
+    <li>Pembelian Ayam Kemas di atas 5,000 ekor mendapat potongan 5%, jadi $445 per ekor.</li>
+  </ul></div>
+</section>
+
+<section id="katalog" class="hide">
+  <div class="grid">
+    <div><div class="chips" id="chips"></div><div id="catalog"></div></div>
+    <aside class="panel cart" id="cartPanel">
+      <h2>Keranjang</h2>
+      <div id="cartItems"></div>
+      <div id="totals"></div>
+      <label for="grp">Perusahaan/Kelompok</label>
+      <input id="grp" placeholder="Nama perusahaan atau kelompok" autocomplete="off">
+      <label for="cname">Nama Pemesan</label>
+      <input id="cname" placeholder="Terisi otomatis dari akun Discord" autocomplete="off" readonly>
+      <label>Jenis Barang (kategori)</label>
+      <div class="auto" id="fcat"></div>
+      <label for="dest">Lokasi Pengiriman</label>
+      <input id="dest" placeholder="Ketik lokasi pengiriman" autocomplete="off">
+      <label>Jumlah Pesanan</label>
+      <div class="auto" id="fqty"></div>
+      <label for="ddate">Tanggal Pengiriman</label>
+      <input id="ddate" type="date">
+      <p class="err" id="err"></p>
+      <button class="btn wide" id="checkout">Checkout</button>
+    </aside>
+  </div>
+</section>
+
+<section id="kirim" class="hide">
+  <div class="chips" id="fchips"></div>
+  <input id="search" placeholder="Cari nomor order, nama, atau tujuan" style="margin-bottom:14px">
+  <div id="orders"></div>
+</section>
+
+<section id="dash" class="hide">
+  <div class="stats" id="stats"></div>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="panel"><h2>Barang terlaris</h2><div id="top"></div></div>
+    <div class="panel"><h2>Pengiriman per tujuan</h2><div id="byDest"></div></div>
+  </div>
+</section>
+</main>
+
+<button class="btn fab" id="fab">Keranjang (0)</button>
+
+<script>
+const CATS=[{id:'bengkel',label:'Restock Bengkel',icon:'📦'},{id:'resto',label:'Restock Restaurant',icon:'🐔'},{id:'badside',label:'Restock Badside',icon:'☠️'}];
+const P=[
+{id:'b1',cat:'bengkel',n:'Material',p:400,u:'item',e:'🧱'},{id:'b2',cat:'bengkel',n:'Besi',p:400,u:'item',e:'⚙️'},
+{id:'b3',cat:'bengkel',n:'Tembaga',p:400,u:'item',e:'🟠'},{id:'b4',cat:'bengkel',n:'Plastik',p:400,u:'item',e:'🧴'},
+{id:'ayam',cat:'resto',n:'Ayam Kemas',p:450,u:'ekor',e:'🐔',tip:'Beli di atas 5,000 ekor dapat potongan 5%, jadi $445/ekor'},
+{id:'r2',cat:'resto',n:'Tomat',p:380,u:'pcs',e:'🍅'},{id:'r3',cat:'resto',n:'Gula',p:380,u:'pcs',e:'🍬'},
+{id:'r4',cat:'resto',n:'Micin',p:380,u:'pcs',e:'🧂'},{id:'r5',cat:'resto',n:'Air',p:300,u:'pcs',e:'💧'},
+{id:'r6',cat:'resto',n:'Minyak Sawit',p:600,u:'pcs',e:'🛢️'},
+{id:'s1',cat:'badside',n:'Material',p:450,u:'item',e:'🧱'},{id:'s2',cat:'badside',n:'Besi',p:450,u:'item',e:'⚙️'},
+{id:'s3',cat:'badside',n:'Tembaga',p:450,u:'item',e:'🟠'},{id:'s4',cat:'badside',n:'Plastik',p:450,u:'item',e:'🧴'},
+{id:'s5',cat:'badside',n:'Kulit',p:500,u:'item',e:'🧥'}];
+const FEE=0.20, BULK_MIN=5000, BULK_PRICE=445;
+const STATUS=['Disiapkan','Dalam Perjalanan','Terkirim'];
+const KEY='jcorp-v1';
+let S={orders:[],dests:['Bengkel Kota','Resto Pelabuhan','Gudang Utara','Markas Badside'],seq:1};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+let cart={},catF='all',isCo=false,filt='Semua',q='';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>'$'+Math.round(n).toLocaleString('en-US');
+const unitPrice=(p,q)=>p.id==='ayam'&&q>BULK_MIN?BULK_PRICE:p.p;
+
+function calc(){
+  const lines=Object.entries(cart).map(([id,q])=>{const p=P.find(x=>x.id===id),u=unitPrice(p,q);return{p,q,u,sum:u*q}});
+  const sub=lines.reduce((a,l)=>a+l.sum,0),fee=isCo?0:Math.round(sub*FEE);
+  return{lines,sub,fee,total:sub+fee,count:lines.reduce((a,l)=>a+l.q,0)};
+}
+function cartCat(){const k=Object.keys(cart)[0];return k?P.find(x=>x.id===k).cat:null}
+function setQty(id,d){
+  const p=P.find(x=>x.id===id),cc=cartCat();
+  if(d>0&&cc&&cc!==p.cat){toast('Keranjang berisi '+CATS.find(c=>c.id===cc).label+'. Kosongkan dulu untuk pesan kategori lain.');return}
+  const n=(cart[id]||0)+d;if(n<=0)delete cart[id];else cart[id]=n;renderCatalog();renderCart()}
+
+function renderChips(){
+  $('chips').innerHTML=[{id:'all',label:'Semua'},...CATS].map(c=>`<button class="chip ${catF===c.id?'on':''}" data-cat="${c.id}">${c.label}</button>`).join('');
+}
+function renderCatalog(){
+  $('catalog').innerHTML=CATS.filter(c=>catF==='all'||catF===c.id).map(c=>`
+  <h2 class="cat">${c.icon} ${c.label}</h2><div class="items">`+P.filter(p=>p.cat===c.id).map(p=>{
+    const q=cart[p.id]||0;
+    return `<div class="card"><span class="em">${p.e}</span><b>${p.n}</b>
+    <div class="price">${money(p.p)} <small>/${p.u}</small></div>${p.tip?`<div class="hint">${p.tip}</div>`:''}
+    ${q?`<div class="step"><button data-m="${p.id}" aria-label="Kurangi ${p.n}">−</button><input class="qty" type="number" inputmode="numeric" min="0" step="1" value="${q}" data-q="${p.id}" aria-label="Jumlah ${p.n}"><button data-a="${p.id}" aria-label="Tambah ${p.n}">+</button></div>`
+       :`<button class="btn" data-a="${p.id}">Tambah ke keranjang</button>`}</div>`}).join('')+`</div>`).join('');
+}
+function renderCart(){
+  const c=calc();
+  $('cartItems').innerHTML=c.lines.length?c.lines.map(l=>`<div class="line"><div><b>${l.p.n}</b> <span class="sm">(${l.p.cat==='bengkel'?'Bengkel':l.p.cat==='resto'?'Restaurant':'Badside'})</span><div class="sm">${l.q} ${l.p.u} × ${money(l.u)}</div></div><div style="text-align:right"><b>${money(l.sum)}</b><br><button class="x" data-r="${l.p.id}">Hapus</button></div></div>`).join(''):'<div class="empty">Keranjang masih kosong. Pilih barang dari katalog.</div>';
+  $('totals').innerHTML=c.lines.length?`<div class="tot"><span>Subtotal</span><span>${money(c.sub)}</span></div>
+   <div class="tot"><span>Biaya operasional 20%</span><span>${isCo?'Bebas (Company)':money(c.fee)}</span></div>
+   <div class="tot g"><span>Total</span><span>${money(c.total)}</span></div>
+   <button class="btn alt" data-clr="1" style="margin-top:8px">Kosongkan keranjang</button>`:'';
+  const cats=[...new Set(c.lines.map(l=>CATS.find(x=>x.id===l.p.cat).label))];
+  $('fcat').textContent=cats.length?cats.join(', '):(catF!=='all'?CATS.find(x=>x.id===catF).label:'Terisi otomatis dari keranjang');
+  $('fqty').textContent=c.count?c.count+' barang':'Terisi otomatis dari keranjang';
+  $('fab').textContent=`Keranjang (${c.count})`;
+}
+function renderDest(){
+  
+}
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
+
+async function checkout(){
+  const c=calc(),name=$('cname').value.trim(),grp=$('grp').value.trim(),dt=$('ddate').value;
+  if(!c.lines.length){$('err').textContent='Keranjang masih kosong.';return}
+  if(!grp){$('err').textContent='Isi Perusahaan/Kelompok dulu.';$('grp').focus();return}
+  if(!name){$('err').textContent='Isi Nama Pemesan dulu.';$('cname').focus();return}
+  if(!$('dest').value.trim()){$('err').textContent='Isi Lokasi Pengiriman dulu.';$('dest').focus();return}
+  if(!dt){$('err').textContent='Pilih Tanggal Pengiriman dulu.';$('ddate').focus();return}
+  $('err').textContent='';
+  const id='JC-'+String(S.seq++).padStart(4,'0');
+  S.orders.unshift({id,ts:Date.now(),name,uid:(U&&U.id)||'',grp,co:isCo,dest:$('dest').value.trim(),date:dt,
+    items:c.lines.map(l=>({n:l.p.n,cat:l.p.cat,q:l.q,u:l.p.u,price:l.u})),sub:c.sub,fee:c.fee,total:c.total,st:0});
+  save();cart={};$('grp').value='';$('dest').value='';
+  renderCatalog();renderCart();
+  const w=await sendWebhook(S.orders[0]);
+  toast('Order '+id+' dibuat'+(w==='ok'?', terkirim ke Discord':w==='off'?', webhook belum diaktifkan':', gagal kirim ke Discord'));
+}
+
+function renderShip(){
+  $('fchips').innerHTML=['Semua',...STATUS].map(s=>`<button class="chip ${filt===s?'on':''}" data-f="${s}">${s}</button>`).join('');
+  const list=S.orders.filter(o=>(filt==='Semua'||STATUS[o.st]===filt)&&(o.id+o.name+o.dest).toLowerCase().includes(q.toLowerCase()));
+  $('orders').innerHTML=list.length?list.map(o=>{
+    const st=STATUS[o.st],cls=o.st===1?'Perjalanan':st;
+    return `<div class="panel ord"><header><h3>${o.id} · ${esc(o.name)}</h3><span class="badge ${cls}">${st}</span></header>
+    <div class="meta">${o.grp?esc(o.grp)+', ':''}lokasi ${esc(o.dest)}, kirim ${o.date?new Date(o.date+'T00:00').toLocaleDateString('id-ID',{dateStyle:'medium'}):'-'}, dipesan ${new Date(o.ts).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'})}</div>
+    ${o.note?`<div class="meta">Catatan: ${esc(o.note)}</div>`:''}
+    <details><summary>${o.items.reduce((a,i)=>a+i.q,0)} barang</summary>${o.items.map(i=>`<div class="tot"><span>${i.n} × ${i.q} ${i.u}</span><span>${money(i.price*i.q)}</span></div>`).join('')}
+    <div class="tot"><span>Biaya operasional</span><span>${o.fee?money(o.fee):'Bebas'}</span></div></details>
+    <div class="ft"><b>${money(o.total)}</b>${o.st<2?`<button class="btn" data-adv="${o.id}">${o.st===0?'Mulai kirim':'Tandai terkirim'}</button>`:'<span class="badge Terkirim">Selesai</span>'}</div></div>`}).join('')
+   :'<div class="empty">Belum ada order di sini. Checkout dari keranjang untuk membuat order pertama.</div>';
+}
+function renderDash(){
+  const today=S.orders.filter(o=>new Date(o.ts).toDateString()===new Date().toDateString());
+  const act=S.orders.filter(o=>o.st<2).length,omz=S.orders.reduce((a,o)=>a+o.total,0),fee=S.orders.reduce((a,o)=>a+o.fee,0);
+  $('stats').innerHTML=[[today.length,'Order hari ini'],[act,'Pengiriman aktif'],[money(omz),'Total omzet'],[money(fee),'Biaya operasional terkumpul']].map(s=>`<div class="stat"><b>${s[0]}</b><span>${s[1]}</span></div>`).join('');
+  const t={};S.orders.forEach(o=>o.items.forEach(i=>{const k=i.n+' ('+(i.cat==='bengkel'?'Bengkel':i.cat==='resto'?'Resto':'Badside')+')';t[k]=(t[k]||0)+i.q}));
+  const top=Object.entries(t).sort((a,b)=>b[1]-a[1]).slice(0,6),mx=top[0]?top[0][1]:1;
+  $('top').innerHTML=top.length?top.map(([k,v])=>`<div class="bar2"><span>${k}</span><i style="width:${v/mx*100}%"></i><b>${v}</b></div>`).join(''):'<div class="empty">Belum ada data penjualan.</div>';
+  const d={};S.orders.forEach(o=>d[o.dest]=(d[o.dest]||0)+1);
+  const dd=Object.entries(d).sort((a,b)=>b[1]-a[1]),dm=dd[0]?dd[0][1]:1;
+  $('byDest').innerHTML=dd.length?dd.map(([k,v])=>`<div class="bar2"><span>${esc(k)}</span><i style="width:${v/dm*100}%"></i><b>${v}</b></div>`).join(''):'<div class="empty">Belum ada pengiriman.</div>';
+}
+function renderHome(){
+  const act=S.orders.filter(o=>o.st<2).length;
+  $('live').textContent=(U?'Halo, '+U.name+'. ':'')+(act?act+' pengiriman sedang berjalan':'Tidak ada pengiriman aktif saat ini');
+  $('svc').innerHTML=CATS.map(c=>{const l=P.filter(p=>p.cat===c.id),pr=l.map(p=>p.p),a=Math.min(...pr),b=Math.max(...pr);
+    return `<button class="svc" data-gocat="${c.id}"><span class="em">${c.icon}</span><h3>${c.label}</h3><p>${l.map(p=>p.n).join(', ')}</p></button>`}).join('');
+}
+function showTab(t){
+  ['home','katalog','kirim','dash'].forEach(x=>$(x).classList.toggle('hide',x!==t));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  $('fab').classList.toggle('hide',t!=='katalog');
+  if(t==='home')renderHome();if(t==='kirim')renderShip();if(t==='dash')renderDash();window.scrollTo(0,0);
+}
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;const d=t.dataset;
+  if(d.gocat){catF=d.gocat;renderChips();renderCatalog();renderCart();showTab('katalog')}
+  else if(d.tab)showTab(d.tab);
+  else if(d.cat){catF=d.cat;renderChips();renderCatalog();renderCart()}
+  else if(d.a)setQty(d.a,1);else if(d.m)setQty(d.m,-1);
+  else if(d.r){delete cart[d.r];renderCatalog();renderCart()}
+  else if(d.clr){cart={};renderCatalog();renderCart()}
+  else if(d.c!==undefined){isCo=d.c==='1';document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b===t));renderCart()}
+  else if(d.f){filt=d.f;renderShip()}
+  else if(d.adv){const o=S.orders.find(x=>x.id===d.adv);if(o&&o.st<2){o.st++;save();renderShip()}}
+  else if(t.id==='checkout')checkout();
+  
+  else if(t.id==='fab')$('cartPanel').scrollIntoView({behavior:'smooth'});
+});
+$('search').addEventListener('input',e=>{q=e.target.value;renderShip()});
+document.addEventListener('change',e=>{const i=e.target.closest('input[data-q]');if(!i)return;const n=Math.floor(Number(i.value));if(!(n>0))delete cart[i.dataset.q];else cart[i.dataset.q]=Math.min(n,999999);renderCatalog();renderCart()});
+document.addEventListener('focusin',e=>{if(e.target.matches&&e.target.matches('input[data-q]'))e.target.select()});
+renderChips();renderCatalog();renderCart();renderDest();
+const d0=new Date();$('ddate').value=d0.getFullYear()+'-'+String(d0.getMonth()+1).padStart(2,'0')+'-'+String(d0.getDate()).padStart(2,'0');
+/* ===== PENGATURAN DISCORD: isi setelah webapp dipublish di hosting sendiri =====
+   CLIENT_ID    : Application ID dari Discord Developer Portal
+   REDIRECT_URI : alamat webapp ini (harus didaftarkan di OAuth2 > Redirects)
+   WEBHOOK_URL  : URL webhook channel order di Discord */
+const CFG={CLIENT_ID:'',REDIRECT_URI:location.origin+location.pathname,WEBHOOK_URL:''};
+let U=null;try{U=JSON.parse(localStorage.getItem('jcorp-user')||'null')}catch(e){}
+const setUser=u=>{U=u;try{u?localStorage.setItem('jcorp-user',JSON.stringify(u)):localStorage.removeItem('jcorp-user')}catch(e){}};
+function enterApp(){
+  $('splash').classList.add('hide');$('login').classList.add('hide');document.body.classList.add('authed');
+  $('cname').value=U.name;$('who').textContent=U.name;
+  const av=$('av');av.textContent=U.name.charAt(0).toUpperCase();
+  if(U.avatar&&U.id){const im=new Image();im.alt='';im.onload=()=>{av.textContent='';av.appendChild(im)};im.src='https://cdn.discordapp.com/avatars/'+U.id+'/'+U.avatar+'.png?size=64'}
+  showTab('home');
+}
+function showLogin(){$('splash').classList.add('hide');$('login').classList.remove('hide');$('demo').classList.toggle('hide',!!CFG.CLIENT_ID)}
+$('dcLogin').onclick=()=>{
+  if(!CFG.CLIENT_ID){$('lerr').textContent='Login Discord belum diatur. Isi CLIENT_ID di bagian CFG pada kode.';return}
+  const st=Math.random().toString(36).slice(2);try{sessionStorage.setItem('jc-state',st)}catch(e){}
+  location.href='https://discord.com/oauth2/authorize?client_id='+CFG.CLIENT_ID+'&response_type=token&scope=identify&state='+st+'&redirect_uri='+encodeURIComponent(CFG.REDIRECT_URI);
+};
+$('demoGo').onclick=()=>{const n=$('dname').value.trim();if(!n){$('lerr').textContent='Isi username dulu.';return}setUser({id:'',name:n,demo:true});enterApp()};
+$('logout').onclick=()=>{setUser(null);location.reload()};
+async function sendWebhook(o){
+  if(!CFG.WEBHOOK_URL)return 'off';
+  const f=(name,value,inline)=>({name,value:String(value||'-').slice(0,1000),inline:!!inline});
+  const items=o.items.map(i=>'• '+i.n+' × '+i.q+' '+i.u+' = '+money(i.price*i.q)).join('\n');
+  const body={username:'J CORP Order',embeds:[{title:'Order baru '+o.id,color:0x0e5c8a,timestamp:new Date(o.ts).toISOString(),fields:[
+    f('Pemesan',o.uid?'<@'+o.uid+'> ('+o.name+')':o.name,true),f('Perusahaan/Kelompok',o.grp,true),
+    f('Jenis Barang',[...new Set(o.items.map(i=>CATS.find(c=>c.id===i.cat).label))].join(', ')),
+    f('Rincian',items),f('Jumlah Pesanan',o.items.reduce((a,i)=>a+i.q,0)+' barang',true),
+    f('Lokasi Pengiriman',o.dest,true),f('Tanggal Pengiriman',o.date,true),
+    f('Subtotal',money(o.sub),true),f('Biaya operasional 20%',money(o.fee),true),f('Total',money(o.total),true)]}]};
+  try{const r=await fetch(CFG.WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.ok?'ok':'fail'}catch(e){return 'fail'}
+}
+async function boot(){
+  const wait=new Promise(r=>setTimeout(r,1600));
+  const h=new URLSearchParams(location.hash.slice(1)),tok=h.get('access_token');
+  if(tok){
+    let ok=false;try{ok=h.get('state')===sessionStorage.getItem('jc-state')}catch(e){}
+    history.replaceState(null,'',location.pathname+location.search);
+    if(ok){try{const r=await fetch('https://discord.com/api/users/@me',{headers:{Authorization:'Bearer '+tok}});const j=await r.json();if(j.id)setUser({id:j.id,name:j.username,avatar:j.avatar})}catch(e){}}
+  }
+  await wait;
+  U?enterApp():showLogin();
+}
+boot();
+</script>
 </body>
 </html>
