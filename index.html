@@ -347,12 +347,12 @@ $('search').addEventListener('input',e=>{q=e.target.value;renderShip()});
 document.addEventListener('change',e=>{const i=e.target.closest('input[data-q]');if(!i)return;const n=Math.floor(Number(i.value));if(!(n>0))delete cart[i.dataset.q];else cart[i.dataset.q]=Math.min(n,999999);renderCatalog();renderCart()});
 document.addEventListener('focusin',e=>{if(e.target.matches&&e.target.matches('input[data-q]'))e.target.select()});
 renderChips();renderCatalog();renderCart();renderDest();
-const d0=new Date();$('ddate').value=d0.getFullYear()+'-'+String(d0.getMonth()+1).padStart(2,'0')+'-'+String(d0.getDate()).padStart(2,'0');
+const d0=new Date();$('ddate').value=d0.getFullYear()+'-'+String(d0.getMonth()+1).padStart(2,'0')+'-'+String(d0.getDate()).padStart(2,'0');   
 /* ===== PENGATURAN DISCORD: isi setelah webapp dipublish di hosting sendiri =====
    CLIENT_ID    : Application ID dari Discord Developer Portal
    REDIRECT_URI : alamat webapp ini (harus didaftarkan di OAuth2 > Redirects)
    WEBHOOK_URL  : URL webhook channel order di Discord */
-const CFG={CLIENT_ID:'1077663414442270822',REDIRECT_URI:location.origin+location.pathname,WEBHOOK_URL:'https://discord.com/api/webhooks/1572483276063506542/l6n72Qkg6JGHr41uGQp7KweQhguCBi56EsYh3TrH9IjSfkEpzYFOULnYS9TW3U2ANEXv'};
+const CFG={CLIENT_ID:'1182642297993703444',REDIRECT_URI:location.origin+location.pathname,WEBHOOK_URL:'https://discord.com/api/webhooks/1572679647471206550/-2yhHOtunOVbiMLrt_xygYplILXWvdSXnIySahcoRROnq0KqmzZLkfJJ3Di-EwenbVAv  '};
 let U=null;try{U=JSON.parse(localStorage.getItem('jcorp-user')||'null')}catch(e){}
 const setUser=u=>{U=u;try{u?localStorage.setItem('jcorp-user',JSON.stringify(u)):localStorage.removeItem('jcorp-user')}catch(e){}};
 function enterApp(){
