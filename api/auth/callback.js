@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
         client_secret: process.env.DISCORD_CLIENT_SECRET,
         grant_type: 'authorization_code',
         code,
-        redirect_uri: 'https://' + req.headers.host + '/api/auth/callback',
+        redirect_uri: 'https://j-corp.vercel.app' + req.headers.host + '/api/auth/callback',
       }),
     });
     const tok = await tr.json();
